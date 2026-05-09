@@ -1,0 +1,28 @@
+{
+  "instance_id": "lowRISC__ibex__ca31ca43f380aded3ddc4121e2bad8c9908a6115",
+  "repo_url": "https://github.com/lowRISC/ibex",
+  "owner": "lowRISC",
+  "repo_name": "ibex",
+  "fix_commit": "ca31ca43f380aded3ddc4121e2bad8c9908a6115",
+  "buggy_rtl_commit": "0f2dc5c64ada16118a8621df9f34cf07eb943f4e",
+  "date_created": "2026-05-08",
+  "rtl_dir": "rtl/",
+  "dv_dir": "dv/cs_registers",
+  "rtl_files_changed": [
+    "rtl/ibex_core.sv",
+    "rtl/ibex_cs_registers.sv"
+  ],
+  "test_commands": [
+    "TOP_MODULE=tb_csr_misa TB_FILE=/tmp/vdv_mine/ibex_csr_simple/tb_csr_misa.sv bash /tmp/vdv_mine/ibex_csr_simple/run_tests.sh"
+  ],
+  "setup_commands": [
+    "git clone https://github.com/lowRISC/ibex repo",
+    "cd repo",
+    "git checkout ca31ca43f380aded3ddc4121e2bad8c9908a6115",
+    "git checkout 0f2dc5c64ada16118a8621df9f34cf07eb943f4e -- rtl/ibex_core.sv",
+    "git checkout 0f2dc5c64ada16118a8621df9f34cf07eb943f4e -- rtl/ibex_cs_registers.sv"
+  ],
+  "rtl_diff": "diff --git a/rtl/ibex_core.sv b/rtl/ibex_core.sv\nindex ff5ecef8..0f43faef 100644\n--- a/rtl/ibex_core.sv\n+++ b/rtl/ibex_core.sv\n@@ -977,7 +977,8 @@ module ibex_core #(\n       .PMPGranularity    ( PMPGranularity    ),\n       .PMPNumRegions     ( PMPNumRegions     ),\n       .RV32E             ( RV32E             ),\n-      .RV32M             ( RV32M             )\n+      .RV32M             ( RV32M             ),\n+      .RV32B             ( RV32B             )\n   ) cs_registers_i (\n       .clk_i                   ( clk                          ),\n       .rst_ni                  ( rst_ni                       ),\ndiff --git a/rtl/ibex_cs_registers.sv b/rtl/ibex_cs_registers.sv\nindex 16a8acd3..c776af27 100644\n--- a/rtl/ibex_cs_registers.sv\n+++ b/rtl/ibex_cs_registers.sv\n@@ -25,7 +25,8 @@ module ibex_cs_registers #(\n     parameter int unsigned      PMPGranularity    = 0,\n     parameter int unsigned      PMPNumRegions     = 4,\n     parameter bit               RV32E             = 0,\n-    parameter ibex_pkg::rv32m_e RV32M             = ibex_pkg::RV32MFast\n+    parameter ibex_pkg::rv32m_e RV32M             = ibex_pkg::RV32MFast,\n+    parameter ibex_pkg::rv32b_e RV32B             = ibex_pkg::RV32BNone\n ) (\n     // Clock and Reset\n     input  logic                 clk_i,\n@@ -119,12 +120,14 @@ module ibex_cs_registers #(\n \n   import ibex_pkg::*;\n \n+  localparam int unsigned RV32BEnabled = (RV32B == RV32BNone) ? 0 : 1;\n   localparam int unsigned RV32MEnabled = (RV32M == RV32MNone) ? 0 : 1;\n   localparam int unsigned PMPAddrWidth = (PMPGranularity > 0) ? 33 - PMPGranularity : 32;\n \n   // misa\n   localparam logic [31:0] MISA_VALUE =\n       (0                 <<  0)  // A - Atomic Instructions extension\n+    | (RV32BEnabled      <<  1)  // B - Bit-Manipulation extension\n     | (1                 <<  2)  // C - Compressed extension\n     | (0                 <<  3)  // D - Double precision floating-point extension\n     | (32'(RV32E)        <<  4)  // E - RV32E base ISA",
+  "rtl_diff_lines": 8,
+  "source": "historical"
+}

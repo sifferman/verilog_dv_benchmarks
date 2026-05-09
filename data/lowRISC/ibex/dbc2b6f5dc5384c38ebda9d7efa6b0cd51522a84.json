@@ -1,0 +1,26 @@
+{
+  "instance_id": "lowRISC__ibex__dbc2b6f5dc5384c38ebda9d7efa6b0cd51522a84",
+  "repo_url": "https://github.com/lowRISC/ibex",
+  "owner": "lowRISC",
+  "repo_name": "ibex",
+  "fix_commit": "dbc2b6f5dc5384c38ebda9d7efa6b0cd51522a84",
+  "buggy_rtl_commit": "9af580f6d99473eb583575a5702bf4c7727b2347",
+  "date_created": "2026-05-08",
+  "rtl_dir": "rtl/",
+  "dv_dir": "dv/cs_registers",
+  "rtl_files_changed": [
+    "rtl/ibex_pkg.sv"
+  ],
+  "test_commands": [
+    "TOP_MODULE=tb_csr_mseccfg TB_FILE=/tmp/vdv_mine/ibex_csr_simple/tb_csr_mseccfg.sv bash /tmp/vdv_mine/ibex_csr_simple/run_tests.sh"
+  ],
+  "setup_commands": [
+    "git clone https://github.com/lowRISC/ibex repo",
+    "cd repo",
+    "git checkout dbc2b6f5dc5384c38ebda9d7efa6b0cd51522a84",
+    "git checkout 9af580f6d99473eb583575a5702bf4c7727b2347 -- rtl/ibex_pkg.sv"
+  ],
+  "rtl_diff": "diff --git a/rtl/ibex_pkg.sv b/rtl/ibex_pkg.sv\nindex bc4a8515..7308e26d 100644\n--- a/rtl/ibex_pkg.sv\n+++ b/rtl/ibex_pkg.sv\n@@ -393,9 +393,6 @@ typedef enum logic[11:0] {\n   CSR_MTVAL     = 12'h343,\n   CSR_MIP       = 12'h344,\n \n-  CSR_MSECCFG   = 12'h390,\n-  CSR_MSECCFGH  = 12'h391,\n-\n   // Physical memory protection\n   CSR_PMPCFG0   = 12'h3A0,\n   CSR_PMPCFG1   = 12'h3A1,\n@@ -418,6 +415,10 @@ typedef enum logic[11:0] {\n   CSR_PMPADDR14 = 12'h3BE,\n   CSR_PMPADDR15 = 12'h3BF,\n \n+  // ePMP control\n+  CSR_MSECCFG   = 12'h747,\n+  CSR_MSECCFGH  = 12'h757,\n+\n   // Debug trigger\n   CSR_TSELECT   = 12'h7A0,\n   CSR_TDATA1    = 12'h7A1,",
+  "rtl_diff_lines": 7,
+  "source": "historical"
+}
