@@ -1,0 +1,28 @@
+{
+  "instance_id": "lowRISC__opentitan__a7cb9a484ee4c227a0b65f4bb6ed372e94e3b7d7",
+  "repo_url": "https://github.com/lowRISC/opentitan",
+  "owner": "lowRISC",
+  "repo_name": "opentitan",
+  "fix_commit": "a7cb9a484ee4c227a0b65f4bb6ed372e94e3b7d7",
+  "buggy_rtl_commit": "30164a4a7d1caf00b9a79e623418dc124bda011c",
+  "fix_commit_msg": "[prim_sha2_pad,rtl] Fix setting of digest mode when continuing\n\nPrior to this commit, `digest_mode_flag_q` would remain `SHA2_None` when\nthe `hash_continue_i` input was set high.  The correct behavior would be\nto update that register based on `digest_mode_i`, however, which this\ncommit fixes.\n\nSigned-off-by: Andreas Kurth <adk@lowrisc.org>",
+  "problem_statement": "[prim_sha2_pad,rtl] Fix setting of digest mode when continuing\n\nPrior to this commit, `digest_mode_flag_q` would remain `SHA2_None` when\nthe `hash_continue_i` input was set high.  The correct behavior would be\nto update that register based on `digest_mode_i`, however, which this\ncommit fixes.\n\nSigned-off-by: Andreas Kurth <adk@lowrisc.org>",
+  "date_created": "2026-05-08",
+  "rtl_dir": "hw/ip/prim/rtl",
+  "dv_dir": "hw/ip/prim/dv",
+  "rtl_files_changed": [
+    "hw/ip/prim/rtl/prim_sha2_pad.sv"
+  ],
+  "test_commands": [
+    "TOP_MODULE=tb_prim_sha2_pad_continue bash clones/lowRISC__opentitan__tb/run_prim_fifo.sh"
+  ],
+  "setup_commands": [
+    "git clone https://github.com/lowRISC/opentitan repo",
+    "cd repo",
+    "git checkout a7cb9a484ee4c227a0b65f4bb6ed372e94e3b7d7",
+    "git checkout 30164a4a7d1caf00b9a79e623418dc124bda011c -- hw/ip/prim/rtl/prim_sha2_pad.sv"
+  ],
+  "rtl_diff": "diff --git a/hw/ip/prim/rtl/prim_sha2_pad.sv b/hw/ip/prim/rtl/prim_sha2_pad.sv\nindex 8684c3e54f..edb18efca4 100644\n--- a/hw/ip/prim/rtl/prim_sha2_pad.sv\n+++ b/hw/ip/prim/rtl/prim_sha2_pad.sv\n@@ -341,9 +341,9 @@ module prim_sha2_pad import prim_sha2_pkg::*;\n     else         tx_count <= tx_count_d;\n   end\n \n-  assign digest_mode_flag_d = hash_start_i ? digest_mode_i  :    // latch in configured mode\n-                              hash_done_i  ? SHA2_None      :    // clear\n-                                             digest_mode_flag_q; // keep\n+  assign digest_mode_flag_d = (hash_start_i || hash_continue_i) ? digest_mode_i  :    // set config\n+                              hash_done_i                       ? SHA2_None      :    // clear\n+                                                                  digest_mode_flag_q; // keep\n \n   always_ff @(posedge clk_i or negedge rst_ni) begin\n     if (!rst_ni)  digest_mode_flag_q <= SHA2_None;",
+  "rtl_diff_lines": 6,
+  "source": "historical"
+}

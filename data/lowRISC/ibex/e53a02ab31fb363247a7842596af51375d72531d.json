@@ -12,7 +12,7 @@
     "rtl/ibex_cs_registers.sv"
   ],
   "test_commands": [
-    "bash /tmp/vdv_mine/ibex_csr_simple/run_tests.sh"
+    "bash clones/lowRISC__ibex__tb/run_tests.sh"
   ],
   "setup_commands": [
     "git clone https://github.com/lowRISC/ibex repo",

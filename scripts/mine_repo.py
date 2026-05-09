@@ -409,7 +409,7 @@ def _run_test(cmd: str, cwd: Path) -> tuple[bool, str]:
 
 def cmd_try_commit(args):
     cdir     = Path(args.clone_dir)
-    test_cwd = Path(args.test_cwd) if args.test_cwd else cdir
+    test_cwd = Path(args.test_cwd) if args.test_cwd else Path.cwd()
 
     result = {
         "repo_url":   args.repo_url,

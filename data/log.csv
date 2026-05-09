@@ -45,4 +45,5 @@ https://github.com/lowRISC/riscv-dejagnu,riscv-dejagnu,fork,,,,,,,
 https://github.com/lowRISC/riscv-gcc,riscv-gcc,fork,,,,,,,
 https://github.com/lowRISC/riscv-newlib,riscv-newlib,fork,,,,,,,
 https://github.com/lowRISC/dma_axi,dma_axi,fork,,,,,,,
-https://github.com/lowRISC/ibex,ibex,,9742d89f,4,2916,2917,rtl/,dv/cs_registers,bash /tmp/vdv_mine/ibex_csr_simple/run_tests.sh
+https://github.com/lowRISC/ibex,ibex,,9742d89f,4,2916,2917,rtl/,dv/cs_registers,bash clones/lowRISC__ibex__tb/run_tests.sh
+https://github.com/lowRISC/opentitan,opentitan,,a7cb9a484ee4c227a0b65f4bb6ed372e94e3b7d7,2,2986,3000,hw/ip/prim/rtl,hw/ip/prim/dv,bash clones/lowRISC__opentitan__tb/run_prim_fifo.sh

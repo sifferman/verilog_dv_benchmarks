@@ -1,0 +1,28 @@
+{
+  "instance_id": "lowRISC__opentitan__3d4980cdcfebd0815c728b182d472879b1471c7e",
+  "repo_url": "https://github.com/lowRISC/opentitan",
+  "owner": "lowRISC",
+  "repo_name": "opentitan",
+  "fix_commit": "3d4980cdcfebd0815c728b182d472879b1471c7e",
+  "buggy_rtl_commit": "55ccb5302855bcf6bcfeda095ad18a370d89bf8f",
+  "fix_commit_msg": "[prim_fifo_sync,rtl] Fix full_o behaviour when Depth == 0\n\nThis is a bit silly, but the storage of an empty fifo is always full\nfor rather trivial reasons. The existing connection didn't really make\nsense (because it was considered full if something was able to read\nfrom it!) so I'm pretty certain this won't break anything.\n\nSigned-off-by: Rupert Swarbrick <rswarbrick@lowrisc.org>",
+  "problem_statement": "[prim_fifo_sync,rtl] Fix full_o behaviour when Depth == 0\n\nThis is a bit silly, but the storage of an empty fifo is always full\nfor rather trivial reasons. The existing connection didn't really make\nsense (because it was considered full if something was able to read\nfrom it!) so I'm pretty certain this won't break anything.\n\nSigned-off-by: Rupert Swarbrick <rswarbrick@lowrisc.org>",
+  "date_created": "2026-05-08",
+  "rtl_dir": "hw/ip/prim/rtl",
+  "dv_dir": "hw/ip/prim/dv",
+  "rtl_files_changed": [
+    "hw/ip/prim/rtl/prim_fifo_sync.sv"
+  ],
+  "test_commands": [
+    "bash clones/lowRISC__opentitan__tb/run_prim_fifo.sh"
+  ],
+  "setup_commands": [
+    "git clone https://github.com/lowRISC/opentitan repo",
+    "cd repo",
+    "git checkout 3d4980cdcfebd0815c728b182d472879b1471c7e",
+    "git checkout 55ccb5302855bcf6bcfeda095ad18a370d89bf8f -- hw/ip/prim/rtl/prim_fifo_sync.sv"
+  ],
+  "rtl_diff": "diff --git a/hw/ip/prim/rtl/prim_fifo_sync.sv b/hw/ip/prim/rtl/prim_fifo_sync.sv\nindex c4c1ac429f..d427b01f03 100644\n--- a/hw/ip/prim/rtl/prim_fifo_sync.sv\n+++ b/hw/ip/prim/rtl/prim_fifo_sync.sv\n@@ -46,7 +46,7 @@ module prim_fifo_sync #(\n \n     // host facing\n     assign wready_o = rready_i;\n-    assign full_o = rready_i;\n+    assign full_o = 1'b1;\n \n     // this avoids lint warnings\n     logic unused_clr;",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

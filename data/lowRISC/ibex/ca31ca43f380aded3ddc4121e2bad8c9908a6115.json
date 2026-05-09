@@ -13,7 +13,7 @@
     "rtl/ibex_cs_registers.sv"
   ],
   "test_commands": [
-    "TOP_MODULE=tb_csr_misa TB_FILE=/tmp/vdv_mine/ibex_csr_simple/tb_csr_misa.sv bash /tmp/vdv_mine/ibex_csr_simple/run_tests.sh"
+    "TOP_MODULE=tb_csr_misa TB_FILE=clones/lowRISC__ibex__tb/tb_csr_misa.sv bash clones/lowRISC__ibex__tb/run_tests.sh"
   ],
   "setup_commands": [
     "git clone https://github.com/lowRISC/ibex repo",

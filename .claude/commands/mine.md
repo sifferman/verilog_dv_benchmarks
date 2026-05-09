@@ -71,30 +71,35 @@ with cocotb, `run*.sh`, or a top-level `README` describing how to run tests.
 Write a single test command `<test_cmd>` that:
 - Compiles and simulates the design
 - Exits **0** on pass, **non-zero** on failure
-- Works when run from `clones/<owner>__<repo_name>` (or a stable sub-directory — record as `--test-cwd`)
+- Uses **relative paths from the project root** — never absolute paths, never `/tmp`
+- Works when run from the project root (the default `test_cwd` for `mine_repo.py`)
 
-Common examples:
+Common examples (paths relative to project root):
 ```bash
-make sim                          # Makefile target
-fusesoc run --target=sim <core>   # FuseSoC
-python -m pytest dv/              # cocotb / pytest
-verilator --cc rtl/top.sv tb/tb.cpp --exe && make -C obj_dir
+make sim                                      # Makefile target in clone
+fusesoc run --target=sim <core>               # FuseSoC
+python -m pytest dv/                          # cocotb / pytest
+bash clones/<owner>__<repo>__tb/run_tests.sh  # custom runner script
 ```
 
 If the existing DV is too complex to run (requires licensed simulators, special
-hardware, large external deps), write a **minimal custom Verilator testbench**:
+hardware, large external deps), write a **minimal custom Verilator testbench**
+and a runner script in `clones/<owner>__<repo>__tb/`. The runner script must:
+- Resolve its own location with `SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"`
+- Derive the repo path as `REPO_DIR="$(cd "$SCRIPT_DIR/../<owner>__<repo>" && pwd)"`
+- Resolve any input `TB_FILE` path to absolute **before** any `cd` that changes CWD
 
 ```bash
-# Compile and run with Verilator --timing (required for initial/always #N):
-verilator --binary --timing --top-module tb_<name> --Mdir /tmp/vbuild \
-  --Wno-fatal <pkg.sv first, then remaining RTL, then tb.sv>
-/tmp/vbuild/Vtb_<name>
+# Example compile-and-run inside the runner script:
+verilator --binary --timing --top-module tb_<name> \
+  --Mdir /tmp/vbuild_<name> --Wno-fatal \
+  <pkg.sv first, then RTL, then tb.sv>
+timeout 30 /tmp/vbuild_<name>/Vtb_<name>
 ```
 
-Keep the testbench file alongside other project assets in a stable directory
-**outside** the repo clone (Verilator testbenches should live in a sibling
-directory like `clones/<owner>__<repo_name>__tb/` or a dedicated `tb/` dir
-in the project root), so that `git clean -fd` inside the clone cannot delete them.
+**IMPORTANT: The `--Mdir` build cache may use `/tmp`. Testbench source files
+(`.sv`, `.sh`) MUST live permanently in `clones/<owner>__<repo>__tb/` — never
+in `/tmp`. Test/setup commands in JSON files must use relative paths only.**
 
 ### 2d. Verify the test runner at HEAD
 
@@ -149,12 +154,24 @@ out automatically** by the script and will not appear in the output.
   missing feature, or RISC-V spec compliance issue
 
 To inspect a candidate's full diff without checking out, `cd` into the clone
-first (so `git show` operates on that repo, not some arbitrary path):
+first (so `git show`/`git log` operate on that repo, not some arbitrary path).
+**Never use `git -C <path>` — always `cd` first:**
 ```bash
 cd clones/<owner>__<repo_name>
+git log --oneline -- <rtl_files>
 git show <fix_commit> -- <rtl_files>
 cd -
 ```
+
+**Keep `data/log.csv` up to date as you walk commits.** After each batch of
+candidates triaged (even if none were saved), update `commits_walked`:
+```bash
+python3 scripts/mine_repo.py update-log \
+  --repo-url "<repo_url>" \
+  --add-commits-walked <N>
+```
+This lets you resume later from a known position and gives an accurate picture
+of coverage in the log.
 
 ---
 

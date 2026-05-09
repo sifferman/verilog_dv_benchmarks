@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git show *)"
+      "Bash(git show *)",
+      "Bash(git log *)",
+      "Bash(python3 scripts/mine_repo.py *)"
     ]
   }
 }
