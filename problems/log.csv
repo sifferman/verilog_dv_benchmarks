@@ -121,7 +121,7 @@ https://github.com/YosysHQ/yosys-web,yosys-web,not enough Verilog/SV (<5%),,,,21
 https://github.com/YosysHQ/yosys-bigsim,yosys-bigsim,,,,,81,,,
 https://github.com/YosysHQ/yosys-plugins,yosys-plugins,not enough Verilog/SV (<5%),,,,24,,,
 https://github.com/YosysHQ/arachne-pnr,arachne-pnr,not enough Verilog/SV (<5%),,,,328,,,
-https://github.com/YosysHQ/picorv32,picorv32,,fac01cee1c03f2209078b3e268987814309dc63d,1,609,610,picorv32.v,testbench.v,bash problems/YosysHQ/picorv32/run_tests.sh
+https://github.com/YosysHQ/picorv32,picorv32,,bfba9b3eb34bfd9cc5d516153ddc960a44f7c5f2,11,609,610,picorv32.v,testbench.v,bash problems/YosysHQ/picorv32/run_tests.sh
 https://github.com/YosysHQ/icestorm,icestorm,not enough Verilog/SV (<5%),,,,851,,,
 https://github.com/YosysHQ/sby,sby,not enough Verilog/SV (<5%),,,,810,,,
 https://github.com/YosysHQ/yosys-bench,yosys-bench,,,,,182,,,
