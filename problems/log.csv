@@ -45,8 +45,8 @@ https://github.com/lowRISC/riscv-dejagnu,riscv-dejagnu,fork,,,,,,,
 https://github.com/lowRISC/riscv-gcc,riscv-gcc,fork,,,,,,,
 https://github.com/lowRISC/riscv-newlib,riscv-newlib,fork,,,,,,,
 https://github.com/lowRISC/dma_axi,dma_axi,fork,,,,,,,
-https://github.com/lowRISC/ibex,ibex,,9742d89f,4,49,50,rtl/,dv/cs_registers,bash tb/lowRISC/ibex/run_tests.sh
-https://github.com/lowRISC/opentitan,opentitan,,d08268e96afbb793f99fa164a39864ff4d981bea,3,2986,3000,hw/ip/prim/rtl,hw/ip/prim/dv,bash tb/lowRISC/opentitan/run_prim_fifo.sh
+https://github.com/lowRISC/ibex,ibex,,9742d89f,4,49,50,rtl/,dv/cs_registers,bash problems/lowRISC/ibex/run_tests.sh
+https://github.com/lowRISC/opentitan,opentitan,,d08268e96afbb793f99fa164a39864ff4d981bea,3,2986,3000,hw/ip/prim/rtl,hw/ip/prim/dv,bash problems/lowRISC/opentitan/run_prim_fifo.sh
 https://github.com/openhwgroup/cv32e40p,cv32e40p,DV in separate repo (core-v-verif); example_tb requires Questa,,,,2411,,,
 https://github.com/openhwgroup/cva6,cva6,DV uses Questa; tb_serdiv abandoned vs current HEAD (TRANS_ID_BITS refactor); riscv-dbg submodule not auto-init,,,,7479,,,
 https://github.com/openhwgroup/cvfpu,cvfpu,DV in separate repo (cvfpu-uvm); empty tb/ in this repo,,,,304,,,
@@ -121,7 +121,7 @@ https://github.com/YosysHQ/yosys-web,yosys-web,not enough Verilog/SV (<5%),,,,21
 https://github.com/YosysHQ/yosys-bigsim,yosys-bigsim,,,,,81,,,
 https://github.com/YosysHQ/yosys-plugins,yosys-plugins,not enough Verilog/SV (<5%),,,,24,,,
 https://github.com/YosysHQ/arachne-pnr,arachne-pnr,not enough Verilog/SV (<5%),,,,328,,,
-https://github.com/YosysHQ/picorv32,picorv32,,,,,610,picorv32.v,testbench.v,bash tb/YosysHQ/picorv32/run_tests.sh
+https://github.com/YosysHQ/picorv32,picorv32,,fac01cee1c03f2209078b3e268987814309dc63d,1,609,610,picorv32.v,testbench.v,bash problems/YosysHQ/picorv32/run_tests.sh
 https://github.com/YosysHQ/icestorm,icestorm,not enough Verilog/SV (<5%),,,,851,,,
 https://github.com/YosysHQ/sby,sby,not enough Verilog/SV (<5%),,,,810,,,
 https://github.com/YosysHQ/yosys-bench,yosys-bench,,,,,182,,,
@@ -143,7 +143,7 @@ https://github.com/YosysHQ/eqy,eqy,not enough Verilog/SV (<5%),,,,344,,,
 https://github.com/YosysHQ/pyosys-tests,pyosys-tests,wrong HDL: primary language is Python,,,,6,,,
 https://github.com/YosysHQ/oss-cad-suite-build,oss-cad-suite-build,not enough Verilog/SV (<5%),,,,774,,,
 https://github.com/YosysHQ/riscv-formal,riscv-formal,,,,,649,,,
-https://github.com/YosysHQ/nerv,nerv,,,,,148,,,
+https://github.com/YosysHQ/nerv,nerv,,d49bdd3dd0f6f3f545fb7b21ed9b35953c64dda0,1,147,148,nerv.sv,testbench.sv,bash problems/YosysHQ/nerv/run_tests.sh
 https://github.com/YosysHQ/MARLANN,MARLANN,fork,,,,187,,,
 https://github.com/YosysHQ/setup-oss-cad-suite,setup-oss-cad-suite,not enough Verilog/SV (<5%),,,,59,,,
 https://github.com/YosysHQ/yosys-manual-build,yosys-manual-build,archived,,,,3,,,
@@ -159,3 +159,6 @@ https://github.com/YosysHQ/rtlil-mlir,rtlil-mlir,not enough Verilog/SV (<5%),,,,
 https://github.com/YosysHQ/yosys-perf,yosys-perf,not enough Verilog/SV (<5%),,,,29,,,
 https://github.com/YosysHQ/property-ir,property-ir,not enough Verilog/SV (<5%),,,,132,,,
 https://github.com/YosysHQ/reports,reports,not enough Verilog/SV (<5%),,,,10,,,
+https://github.com/secworks/sha256,,,,,,,src/rtl,src/tb,bash problems/secworks/sha256/run_tests.sh
+https://github.com/alexforencich/verilog-lfsr,,,,,,,rtl,tb,bash problems/alexforencich/verilog-lfsr/run_tests.sh
+https://github.com/corundum/corundum,,,,,,,fpga/common/rtl,fpga/common/tb,bash problems/corundum/corundum/run_cmac_pad.sh

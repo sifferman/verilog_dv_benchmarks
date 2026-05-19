@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Populate tb/lowRISC/ibex/vendor/ with the lowrisc_ip files needed by
+# Populate problems/lowRISC/ibex/vendor/ with the lowrisc_ip files needed by
 # run_tb_cs_registers.sh and run_tests.sh, plus three hand-written
 # abstraction-layer wrappers (prim_buf, prim_flop, prim_clock_gating).
 #
@@ -7,8 +7,9 @@
 # full vendor tree (older commits may have a sparser set, e.g. no mubi).
 # This makes the runners FuseSoC-free and stable across all instance commits.
 #
-# The output directory tb/lowRISC/ibex/vendor/ is gitignored; this script is
-# the canonical way to (re)create it. Run it once after cloning the project.
+# The output directory problems/lowRISC/ibex/vendor/ is gitignored; this script
+# is the canonical way to (re)create it. The ibex runner auto-invokes it on
+# first run if vendor/ is missing or empty.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

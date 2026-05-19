@@ -5,6 +5,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  # Prebuilt rv32i toolchain (matches what picorv32, nerv, and many other
+  # small RISC-V cores expect for firmware builds).
+  RISCV32_TOOLCHAIN_URL: https://github.com/stnolting/riscv-gcc-prebuilt/releases/download/rv32i-4.0.0/riscv32-unknown-elf.gcc-13.2.0.tar.gz
+
 jobs:
   VerifyAll:
     runs-on: ubuntu-latest
@@ -13,13 +18,33 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install dependencies
+      - name: Install system + Python dependencies
         run: |
           sudo apt-get install python3-dev
           pip3 install -r requirements.txt
+          # FuseSoC (.core-driven builds, used by olofk/serv, pulp-platform, ...)
+          pip3 install fusesoc
+          # cocotb + cocotb-test for Make-based and pytest-based cocotb testbenches
+          pip3 install "cocotb<2" cocotb-test cocotbext-axi cocotbext-eth cocotbext-pcie cocotbext-uart cocotbext-i2c
+
+      - name: Install HDL tools (oss-cad-suite, sv2v)
+        run: |
           wget -O - https://raw.githubusercontent.com/sifferman/hdl-tool-installer/main/install | bash -s -- . --oss-cad-suite --zachjs-sv2v
           echo "$GITHUB_WORKSPACE/oss-cad-suite/bin" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/zachjs-sv2v" >> $GITHUB_PATH
+
+      - name: Install riscv32-unknown-elf toolchain
+        run: |
+          mkdir -p "$RUNNER_TEMP/riscv32"
+          wget -qO- "$RISCV32_TOOLCHAIN_URL" | tar -xz -C "$RUNNER_TEMP/riscv32"
+          echo "$RUNNER_TEMP/riscv32/bin" >> $GITHUB_PATH
+
+      - name: Verify toolchain availability
+        run: |
+          which iverilog verilator yosys sv2v fusesoc riscv32-unknown-elf-gcc
+          iverilog -V | head -1
+          fusesoc --version
+          riscv32-unknown-elf-gcc --version | head -1
 
       - run: make verify-all WORKERS=1
 

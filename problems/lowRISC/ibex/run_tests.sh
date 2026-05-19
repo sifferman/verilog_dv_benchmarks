@@ -2,7 +2,7 @@
 # Build and run a custom ibex CSR-related testbench.
 #
 # Self-contained: ibex RTL from the live clone working tree; lowrisc_ip vendor
-# files from tb/lowRISC/ibex/vendor/. No FuseSoC required.
+# files from problems/lowRISC/ibex/vendor/. No FuseSoC required.
 #
 # Used by per-instance custom testbenches (e.g. tb_csr_misa, tb_csr_mseccfgh)
 # that test specific behaviors not covered by the official tb_cs_registers.

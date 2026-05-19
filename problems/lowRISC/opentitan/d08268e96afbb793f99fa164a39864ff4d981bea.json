@@ -12,7 +12,7 @@
     "hw/ip/prim/rtl/prim_subreg.sv"
   ],
   "test_commands": [
-    "TOP_MODULE=tb_prim_subreg_rc bash tb/lowRISC/opentitan/run_prim_fifo.sh"
+    "TOP_MODULE=tb_prim_subreg_rc bash problems/lowRISC/opentitan/run_prim_fifo.sh"
   ],
   "rtl_diff": "diff --git a/hw/ip/prim/rtl/prim_subreg.sv b/hw/ip/prim/rtl/prim_subreg.sv\nindex 1215e430f9..691c541caf 100644\n--- a/hw/ip/prim/rtl/prim_subreg.sv\n+++ b/hw/ip/prim/rtl/prim_subreg.sv\n@@ -61,6 +61,13 @@ module prim_subreg\n   // feed back out for consolidation\n   assign ds = wr_en ? wr_data : qs;\n   assign qe = wr_en;\n-  assign qs = q;\n+\n+  if (SwAccess == SwAccessRC) begin : gen_rc\n+    // In case of a SW RC colliding with a HW write, SW gets the value written by HW\n+    // but the register is cleared to 0. See #5416 for a discussion.\n+    assign qs = de && we ? d : q;\n+  end else begin : gen_no_rc\n+    assign qs = q;\n+  end\n \n endmodule",
   "rtl_diff_lines": 9,

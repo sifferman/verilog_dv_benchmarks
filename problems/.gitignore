@@ -1,6 +1,0 @@
-# Ignore everything except benchmark instances, the log, and this file
-*
-!*/
-!*.json
-!log.csv
-!.gitignore

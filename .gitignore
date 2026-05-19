@@ -1,5 +1,22 @@
+# dvbench files
 clones/
 logs/
 sandboxes/
-tb/**/vendor/
+problems/**/vendor/
 __pycache__
+
+# fusesoc
+fusesoc/
+
+# Simulator build outputs under problems/ and clones/
+sim_build/
+obj_dir/
+**/*.vcd
+**/*.fst
+**/*.vvp
+results.xml
+
+# Local scratch / personal notes
+all.log
+scrape
+SWE-bench.tree

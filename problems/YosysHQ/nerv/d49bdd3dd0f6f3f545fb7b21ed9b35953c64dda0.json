@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/nerv/d49bdd3dd0f6f3f545fb7b21ed9b35953c64dda0",
+  "repo_url": "https://github.com/YosysHQ/nerv",
+  "owner": "YosysHQ",
+  "repo_name": "nerv",
+  "fix_commit": "d49bdd3dd0f6f3f545fb7b21ed9b35953c64dda0",
+  "buggy_rtl_commit": "f6c72907121e4297021d44e7901c93ce6cc34c43",
+  "fix_commit_msg": "Fixup use before declares",
+  "description": "Fixup use before declares",
+  "date_created": "2026-05-19",
+  "rtl_dir": "nerv.sv",
+  "dv_dir": "testbench.sv",
+  "rtl_files_changed": [
+    "nerv.sv"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/nerv/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/nerv.sv b/nerv.sv\nindex f95bbde..cfdd074 100644\n--- a/nerv.sv\n+++ b/nerv.sv\n@@ -399,6 +399,8 @@ module nerv #(\n \treg [4:0] mem_rd_reg;\n \treg [4:0] mem_rd_func;\n \n+\treg [31:0] mem_rdata;\n+\n \treg mem_rd_enable_q;\n \treg [4:0] mem_rd_reg_q;\n \treg [4:0] mem_rd_func_q;\n@@ -528,6 +530,7 @@ module nerv #(\n \tlocalparam MCAUSE_ECALL_M_MODE             = 32'h0000000b;\n \n \tlocalparam IRQ_MASK = 32'hFFFF0888;\n+\treg [4:0] irq_num;\n \n \t// next write, next destination (rd) value & register\n \treg next_wr;\n@@ -608,21 +611,21 @@ module nerv #(\n \twire [31:0] csr_``NAME``_next  = csr_``ARRAY``_next[(INDEX)*32 +: 32];  \\\n \tassign csr_``ARRAY``_sel[INDEX] = csr_``NAME``_sel;\n \n-\t// dummy out missing select lines\n-\tassign csr_hpm_event_sel[2:0] = 0;\n-\tassign csr_hpm_counter_sel[1] = 0;\n-\tassign csr_hpm_counterh_sel[1] = 0;\n-\n `NERV_CSRS\n `undef NERV_CSR_REG_MRW\n `undef NERV_CSR_VAL_MRW\n `undef NERV_CSR_VAL_MRO\n `undef NERV_CSR_ARR_DEF\n `undef NERV_CSR_ARR_MRW\n+\n+\t// dummy out missing select lines\n+\tassign csr_hpm_event_sel[2:0] = 0;\n+\tassign csr_hpm_counter_sel[1] = 0;\n+\tassign csr_hpm_counterh_sel[1] = 0;\n+\n `endif // NERV_CSR\n \n \twire [31:0] irq_en;\n-\treg [4:0] irq_num;\n \tassign irq_en = irq & csr_mie_value;\n \n \t// resolve interrupt priority\n@@ -1139,7 +1142,6 @@ module nerv #(\n \t\tend\n \tend\n \n-\treg [31:0] mem_rdata;\n `ifdef NERV_RVFI\n \treg next_rvfi_intr;\n \treg rvfi_trap_q;",
+  "rtl_diff_lines": 16,
+  "source": "historical"
+}

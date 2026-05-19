@@ -11,7 +11,7 @@
     "rtl/ibex_pkg.sv"
   ],
   "test_commands": [
-    "bash tb/lowRISC/ibex/run_tb_cs_registers.sh"
+    "bash problems/lowRISC/ibex/run_tb_cs_registers.sh"
   ],
   "rtl_diff": "diff --git a/rtl/ibex_pkg.sv b/rtl/ibex_pkg.sv\nindex bc4a8515..7308e26d 100644\n--- a/rtl/ibex_pkg.sv\n+++ b/rtl/ibex_pkg.sv\n@@ -393,9 +393,6 @@ typedef enum logic[11:0] {\n   CSR_MTVAL     = 12'h343,\n   CSR_MIP       = 12'h344,\n \n-  CSR_MSECCFG   = 12'h390,\n-  CSR_MSECCFGH  = 12'h391,\n-\n   // Physical memory protection\n   CSR_PMPCFG0   = 12'h3A0,\n   CSR_PMPCFG1   = 12'h3A1,\n@@ -418,6 +415,10 @@ typedef enum logic[11:0] {\n   CSR_PMPADDR14 = 12'h3BE,\n   CSR_PMPADDR15 = 12'h3BF,\n \n+  // ePMP control\n+  CSR_MSECCFG   = 12'h747,\n+  CSR_MSECCFGH  = 12'h757,\n+\n   // Debug trigger\n   CSR_TSELECT   = 12'h7A0,\n   CSR_TDATA1    = 12'h7A1,",
   "rtl_diff_lines": 7,

@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/fac01cee1c03f2209078b3e268987814309dc63d",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "fac01cee1c03f2209078b3e268987814309dc63d",
+  "buggy_rtl_commit": "258d63d4762a86385f69c7699b485c0c5559c763",
+  "fix_commit_msg": "- fix missing brackets",
+  "description": "- fix missing brackets",
+  "date_created": "2026-05-18",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "picorv32.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex 4b1eca9..6364cbe 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -1909,7 +1909,7 @@ module picorv32 #(\n \n \t\tif (ENABLE_IRQ) begin\n \t\t\tnext_irq_pending = next_irq_pending | irq;\n-\t\t\tif ENABLE_IRQ_TIMER && timer\n+\t\t\tif(ENABLE_IRQ_TIMER && timer)\n \t\t\t\tif (timer - 1 == 0)\n \t\t\t\t\tnext_irq_pending[irq_timer] = 1;\n \t\tend",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

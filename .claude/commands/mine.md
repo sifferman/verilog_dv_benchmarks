@@ -76,11 +76,42 @@ Write a single test command `<test_cmd>` that:
 
 Common examples (paths relative to project root):
 ```bash
-make sim                                      # Makefile target in clone
-fusesoc run --target=sim <core>               # FuseSoC
-python -m pytest dv/                          # cocotb / pytest
-bash tb/<owner>/<repo>/run_tests.sh           # custom runner script
+make sim                                          # Makefile target in clone
+fusesoc run --target=sim <core>                   # FuseSoC
+python -m pytest dv/                              # cocotb / pytest
+bash problems/<owner>/<repo>/run_tests.sh         # custom runner script
 ```
+
+#### Toolchain policy
+
+A repo with a **unique build toolchain** is fine to mine as long as one of
+these is true:
+
+1. **The toolchain can be replicated** with what we already have. The most
+   common case: a repo's official DV runs on commercial VCS / Questa /
+   Xcelium, but the same testbench compiles under modern Verilator with
+   `--binary` (see "Verilator version note" below). Replicate, don't import.
+2. **The tool can be installed in CI** — extend
+   `.github/workflows/verify.yml` to install it and add the binary to
+   `$GITHUB_PATH`. Already supported there: oss-cad-suite (iverilog,
+   verilator, yosys), sv2v, FuseSoC (`pip install fusesoc`), cocotb 1.x +
+   cocotb-test stack, riscv32-unknown-elf-gcc. Source `problems/env.sh`
+   from your runner so it discovers the same tools locally.
+
+If a repo requires a **new toolchain** that's neither replicable nor on the
+list above, do not silently skip — instead:
+- Add an install step to `.github/workflows/verify.yml` (Apache/MIT-licensed
+  prebuilt binary preferred; document the source URL inline).
+- Add a discovery block to `problems/env.sh` so local runs find it.
+- Then write the runner.
+
+Hard blockers that *do* warrant `update-log --reason ...` and skipping:
+- Tools that can't be redistributed (e.g. Questa, VCS, Vivado, Quartus) and
+  the repo's testbench has no open-source equivalent path.
+- Tools that require a license server you don't control.
+- Anything that depends on a hardware target board to run.
+
+Mark these with reasons like `"Questa/VCS-only DV"` or `"hardware-in-the-loop only"`.
 
 **STRONGLY PREFER using the repo's own DV.** Even if the full test suite can't
 run, look hard for a subset that can:
@@ -113,8 +144,9 @@ official source file is never modified in-place. Both the DV C++ model and the
 RTL must come from the **same checked-out commit** so they stay consistent.
 
 If even patching is too invasive and no DV exists, write a **minimal custom
-Verilator testbench** and a runner script in `tb/<owner>/<repo>/`. The runner
-script must:
+Verilator testbench** and a runner script in `problems/<owner>/<repo>/`. The
+runner script must:
+- Source the shared env: `. "$SCRIPT_DIR/../../env.sh"`
 - Resolve its own location with `SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"`
 - Derive the repo path as `REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/<owner>/<repo>" && pwd)"`
 - Resolve any input `TB_FILE` path to absolute **before** any `cd` that changes CWD
@@ -128,7 +160,7 @@ timeout 30 /tmp/vbuild_<name>/Vtb_<fix_commit_8>
 ```
 
 **IMPORTANT: The `--Mdir` build cache may use `/tmp`. Testbench source files
-(`.sv`, `.sh`) MUST live permanently in `tb/<owner>/<repo>/` — never in
+(`.sv`, `.sh`) MUST live permanently in `problems/<owner>/<repo>/` — never in
 `/tmp`. Test/setup commands in JSON files must use relative paths only.**
 
 ### 2d. Verify the test runner at HEAD
@@ -270,14 +302,20 @@ override rather than modifying the shared testbench.
 (first 8 chars) — `tb_<fix_commit_8>.sv` — not after the module. This makes
 the association between testbench and problem unambiguous.
 
-Store per-candidate testbenches in the tracked `tb/` directory (never inside
-`clones/` which is gitignored):
+Store per-candidate testbenches alongside their problem instances under
+`problems/<owner>/<repo_name>/` (never inside `clones/`, which is gitignored):
 ```
-tb/<owner>/<repo_name>/
-  run_tests.sh           # shared runner, reads TB_FILE env var
-  run_tb_official.sh     # official DV runner (preferred)
-  tb_<fix_commit_8>.sv   # focused single-candidate TB (last resort)
+problems/<owner>/<repo_name>/
+  <fix_commit>.json        # instance spec (SWE-bench style)
+  run_tests.sh             # shared runner, reads TB_FILE env var
+  run_tb_official.sh       # official DV runner (preferred)
+  tb_<fix_commit_8>.sv     # focused single-candidate TB (last resort)
 ```
+
+The `problems/env.sh` file at the top of `problems/` provides shared toolchain
+discovery (riscv32/64-gcc, FuseSoC, oss-cad-suite, sv2v) plus cocotb-env
+helpers (`dvbench_cocotb_make`, `dvbench_cocotb_pytest`). Source it from every
+runner.
 
 ---
 

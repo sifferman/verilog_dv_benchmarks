@@ -12,7 +12,7 @@
     "hw/ip/prim/rtl/prim_fifo_sync.sv"
   ],
   "test_commands": [
-    "bash tb/lowRISC/opentitan/run_prim_fifo.sh"
+    "bash problems/lowRISC/opentitan/run_prim_fifo.sh"
   ],
   "rtl_diff": "diff --git a/hw/ip/prim/rtl/prim_fifo_sync.sv b/hw/ip/prim/rtl/prim_fifo_sync.sv\nindex c4c1ac429f..d427b01f03 100644\n--- a/hw/ip/prim/rtl/prim_fifo_sync.sv\n+++ b/hw/ip/prim/rtl/prim_fifo_sync.sv\n@@ -46,7 +46,7 @@ module prim_fifo_sync #(\n \n     // host facing\n     assign wready_o = rready_i;\n-    assign full_o = rready_i;\n+    assign full_o = 1'b1;\n \n     // this avoids lint warnings\n     logic unused_clr;",
   "rtl_diff_lines": 2,

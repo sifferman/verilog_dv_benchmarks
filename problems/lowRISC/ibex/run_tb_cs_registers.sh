@@ -3,8 +3,8 @@
 # Compiles with `verilator --binary` (--binary implies --timing).
 #
 # Self-contained: ibex RTL + DV come from the live ibex clone working tree;
-# all lowrisc_ip vendor files come from tb/lowRISC/ibex/vendor/ (committed
-# in this repo). No FuseSoC required.
+# all lowrisc_ip vendor files come from problems/lowRISC/ibex/vendor/
+# (populated on first run by populate_vendor.sh). No FuseSoC required.
 #
 # Two minimal patches are applied to tb_cs_registers.sv at build time:
 #   1. Remove `ifndef VERILATOR guard so the clock/reset generator runs.
