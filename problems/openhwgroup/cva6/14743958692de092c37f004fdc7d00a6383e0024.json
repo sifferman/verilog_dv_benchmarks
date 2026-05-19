@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/14743958692de092c37f004fdc7d00a6383e0024",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "14743958692de092c37f004fdc7d00a6383e0024",
+  "buggy_rtl_commit": "f332688fc015de0f36390958211c6f77778a7bb5",
+  "fix_commit_msg": "decoder.sv: sfence.vma valid only if S mode supported (fix #1866) (#1869)",
+  "description": "decoder.sv: sfence.vma valid only if S mode supported (fix #1866) (#1869)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_14743958.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 0ebf6b98..4961e952 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -221,8 +221,9 @@ module decoder\n                 default: begin\n                   if (instr.instr[31:25] == 7'b1001) begin\n                     // check privilege level, SFENCE.VMA can only be executed in M/S mode\n+                    // only if S mode is supported\n                     // otherwise decode an illegal instruction\n-                    illegal_instr    = (((CVA6Cfg.RVS && priv_lvl_i == riscv::PRIV_LVL_S) || ((!CVA6Cfg.RVS && !CVA6Cfg.RVU) || priv_lvl_i == riscv::PRIV_LVL_M)) && instr.itype.rd == '0) ? 1'b0 : 1'b1;\n+                    illegal_instr    = (CVA6Cfg.RVS && (priv_lvl_i inside {riscv::PRIV_LVL_M, riscv::PRIV_LVL_S}) && instr.itype.rd == '0) ? 1'b0 : 1'b1;\n                     instruction_o.op = ariane_pkg::SFENCE_VMA;\n                     // check TVM flag and intercept SFENCE.VMA call if necessary\n                     if (CVA6Cfg.RVS && priv_lvl_i == riscv::PRIV_LVL_S && tvm_i)",
+  "rtl_diff_lines": 3,
+  "source": "historical"
+}

@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/283177c24a1884a558f2aab26dea17d785a929db",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "283177c24a1884a558f2aab26dea17d785a929db",
+  "buggy_rtl_commit": "4641acf9d2a58e3f14561575526145d45a59c57c",
+  "fix_commit_msg": "Branch unit: Fix incorrect raising of instruction fetch misaligned exception (#1467)",
+  "description": "Branch unit: Fix incorrect raising of instruction fetch misaligned exception (#1467)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/branch_unit.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_283177c2.sh"
+  ],
+  "rtl_diff": "diff --git a/core/branch_unit.sv b/core/branch_unit.sv\nindex 087b7180..2d075098 100644\n--- a/core/branch_unit.sv\n+++ b/core/branch_unit.sv\n@@ -86,11 +86,21 @@ module branch_unit #(\n     end\n     // use ALU exception signal for storing instruction fetch exceptions if\n     // the target address is not aligned to a 2 byte boundary\n+    //\n+    logic jump_taken;\n     always_comb begin : exception_handling\n+        \n+        // Do a jump if it is either unconditional jump (JAL | JALR) or `taken` conditional jump\n+        jump_taken = !(ariane_pkg::op_is_branch(fu_data_i.operation)) || \n+            ((ariane_pkg::op_is_branch(fu_data_i.operation)) && branch_comp_res_i);\n         branch_exception_o.cause = riscv::INSTR_ADDR_MISALIGNED;\n         branch_exception_o.valid = 1'b0;\n         branch_exception_o.tval  = {{riscv::XLEN-riscv::VLEN{pc_i[riscv::VLEN-1]}}, pc_i};\n-        // only throw exception if this is indeed a branch\n-        if (branch_valid_i && target_address[0] != 1'b0) branch_exception_o.valid = 1'b1;\n+        // Only throw instruction address misaligned exception if this is indeed a `taken` conditional branch or\n+        // an unconditional jump\n+        if (branch_valid_i && \n+            target_address[0] != 1'b0 && \n+            jump_taken)\n+            branch_exception_o.valid = 1'b1;\n     end\n endmodule",
+  "rtl_diff_lines": 14,
+  "source": "historical"
+}

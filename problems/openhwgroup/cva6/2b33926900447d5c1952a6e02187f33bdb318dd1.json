@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/2b33926900447d5c1952a6e02187f33bdb318dd1",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "2b33926900447d5c1952a6e02187f33bdb318dd1",
+  "buggy_rtl_commit": "4103b2ccdc071c975f7ff53e68ba86559a7898f9",
+  "fix_commit_msg": "fix: exception on misaligned branch if no RVC (#1719)",
+  "description": "fix: exception on misaligned branch if no RVC (#1719)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "core",
+  "rtl_files_changed": [
+    "core/branch_unit.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_2b339269.sh"
+  ],
+  "rtl_diff": "diff --git a/core/branch_unit.sv b/core/branch_unit.sv\nindex 47004fe6..dfcb1c76 100644\n--- a/core/branch_unit.sv\n+++ b/core/branch_unit.sv\n@@ -99,6 +99,8 @@ module branch_unit #(\n     branch_exception_o.tval = {{riscv::XLEN - riscv::VLEN{pc_i[riscv::VLEN-1]}}, pc_i};\n     // Only throw instruction address misaligned exception if this is indeed a `taken` conditional branch or\n     // an unconditional jump\n-    if (branch_valid_i && target_address[0] != 1'b0 && jump_taken) branch_exception_o.valid = 1'b1;\n+    if (branch_valid_i && (target_address[0] || (!CVA6Cfg.RVC && target_address[1])) && jump_taken) begin\n+      branch_exception_o.valid = 1'b1;\n+    end\n   end\n endmodule",
+  "rtl_diff_lines": 4,
+  "source": "historical"
+}

@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/3fcb7b9c9b4f46fa33387f6a699fe1da29dc9afb",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "3fcb7b9c9b4f46fa33387f6a699fe1da29dc9afb",
+  "buggy_rtl_commit": "b7e936e7546e1df5a925d59223076ffe9e1a487c",
+  "fix_commit_msg": "Do not support DRET when DebugEn = 0 (#1596)\n\nWhen debug mode is disable, DRET instruction is not supported.",
+  "description": "Do not support DRET when DebugEn = 0 (#1596)\n\nWhen debug mode is disable, DRET instruction is not supported.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_3fcb7b9c.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 2a7dd363..4948512d 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -171,8 +171,12 @@ module decoder\n                 // DRET\n                 12'b111_1011_0010: begin\n                   instruction_o.op = ariane_pkg::DRET;\n-                  // check that we are in debug mode when executing this instruction\n-                  illegal_instr = (!debug_mode_i) ? 1'b1 : illegal_instr;\n+                  if (CVA6Cfg.DebugEn) begin\n+                    // check that we are in debug mode when executing this instruction\n+                    illegal_instr = (!debug_mode_i) ? 1'b1 : illegal_instr;\n+                  end else begin\n+                    illegal_instr = 1'b1;\n+                  end\n                 end\n                 // WFI\n                 12'b1_0000_0101: begin",
+  "rtl_diff_lines": 8,
+  "source": "historical"
+}

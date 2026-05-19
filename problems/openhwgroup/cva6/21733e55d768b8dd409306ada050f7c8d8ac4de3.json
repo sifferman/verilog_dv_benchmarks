@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/21733e55d768b8dd409306ada050f7c8d8ac4de3",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "21733e55d768b8dd409306ada050f7c8d8ac4de3",
+  "buggy_rtl_commit": "96ae8ed223ec162ae1bc1959fc47a3b18b81236c",
+  "fix_commit_msg": "decoder.sv: add checks for some B instructions (fix #2276) (#2282)",
+  "description": "decoder.sv: add checks for some B instructions (fix #2276) (#2282)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_21733e55.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 38d86e72..703ab7c0 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -904,11 +904,12 @@ module decoder\n             unique case (instr.itype.funct3)\n               3'b001: begin\n                 if (instr.instr[31:25] == 7'b0110000) begin\n-                  if (instr.instr[22:20] == 3'b100) instruction_o.op = ariane_pkg::SEXTB;\n-                  else if (instr.instr[22:20] == 3'b101) instruction_o.op = ariane_pkg::SEXTH;\n-                  else if (instr.instr[22:20] == 3'b010) instruction_o.op = ariane_pkg::CPOP;\n-                  else if (instr.instr[22:20] == 3'b000) instruction_o.op = ariane_pkg::CLZ;\n-                  else if (instr.instr[22:20] == 3'b001) instruction_o.op = ariane_pkg::CTZ;\n+                  if (instr.instr[24:20] == 5'b00100) instruction_o.op = ariane_pkg::SEXTB;\n+                  else if (instr.instr[24:20] == 5'b00101) instruction_o.op = ariane_pkg::SEXTH;\n+                  else if (instr.instr[24:20] == 5'b00010) instruction_o.op = ariane_pkg::CPOP;\n+                  else if (instr.instr[24:20] == 5'b00000) instruction_o.op = ariane_pkg::CLZ;\n+                  else if (instr.instr[24:20] == 5'b00001) instruction_o.op = ariane_pkg::CTZ;\n+                  else illegal_instr_bm = 1'b1;\n                 end else if (instr.instr[31:26] == 6'b010010) instruction_o.op = ariane_pkg::BCLRI;\n                 else if (instr.instr[31:26] == 6'b011010) instruction_o.op = ariane_pkg::BINVI;\n                 else if (instr.instr[31:26] == 6'b001010) instruction_o.op = ariane_pkg::BSETI;",
+  "rtl_diff_lines": 11,
+  "source": "historical"
+}

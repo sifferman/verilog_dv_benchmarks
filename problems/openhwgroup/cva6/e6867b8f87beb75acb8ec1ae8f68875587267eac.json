@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/e6867b8f87beb75acb8ec1ae8f68875587267eac",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "e6867b8f87beb75acb8ec1ae8f68875587267eac",
+  "buggy_rtl_commit": "79701408ff41d1e3f207bc2c05643eba5132dcbc",
+  "fix_commit_msg": "compressed_decoder.sv: fix c.sh (issue #3051) (#3059)\n\nbit 6 of c.sh must be equal to 0.\nIf bit 6 equals 1, an illegal instruction exception shall be raised.\n\n---------\n\nSigned-off-by: Andr\u00e9 Sintzoff <andre.sintzoff@thalesgroup.com>\nCo-authored-by: Ayoub Jalali <ayoub.jalali@external.thalesgroup.com>\nCo-authored-by: JeanRochCoulon <jean-roch.coulon@thalesgroup.com>",
+  "description": "compressed_decoder.sv: fix c.sh (issue #3051) (#3059)\n\nbit 6 of c.sh must be equal to 0.\nIf bit 6 equals 1, an illegal instruction exception shall be raised.\n\n---------\n\nSigned-off-by: Andr\u00e9 Sintzoff <andre.sintzoff@thalesgroup.com>\nCo-authored-by: Ayoub Jalali <ayoub.jalali@external.thalesgroup.com>\nCo-authored-by: JeanRochCoulon <jean-roch.coulon@thalesgroup.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "core/pmp/tb",
+  "rtl_files_changed": [
+    "core/compressed_decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_e6867b8f.sh"
+  ],
+  "rtl_diff": "diff --git a/core/compressed_decoder.sv b/core/compressed_decoder.sv\nindex 26c0289a..76385e5e 100644\n--- a/core/compressed_decoder.sv\n+++ b/core/compressed_decoder.sv\n@@ -227,6 +227,7 @@ module compressed_decoder #(\n                     1'b0,\n                     riscv::OpcodeStore\n                   };\n+                  if (instr_i[6] == 1'b1) illegal_instr_o = 1'b1;\n                 end\n \n                 default: begin",
+  "rtl_diff_lines": 1,
+  "source": "historical"
+}

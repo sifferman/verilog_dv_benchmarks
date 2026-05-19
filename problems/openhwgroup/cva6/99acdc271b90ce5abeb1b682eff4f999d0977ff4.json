@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/99acdc271b90ce5abeb1b682eff4f999d0977ff4",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "99acdc271b90ce5abeb1b682eff4f999d0977ff4",
+  "buggy_rtl_commit": "d0a4c9f82e8a2bedaaa52193d52156a60a2d731e",
+  "fix_commit_msg": "decoder.sv: ZEXT.H is valid only with Zbb bitmanip extension (fix #1234) (#1236)\n\nSigned-off-by: Andr\u00e9 Sintzoff <andre.sintzoff@thalesgroup.com>",
+  "description": "decoder.sv: ZEXT.H is valid only with Zbb bitmanip extension (fix #1234) (#1236)\n\nSigned-off-by: Andr\u00e9 Sintzoff <andre.sintzoff@thalesgroup.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "core",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_99acdc27.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 1e316db4..c384184b 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -505,7 +505,6 @@ module decoder import ariane_pkg::*; (\n                             {7'b000_0001, 3'b101}: instruction_o.op = ariane_pkg::DIVU;\n                             {7'b000_0001, 3'b110}: instruction_o.op = ariane_pkg::REM;\n                             {7'b000_0001, 3'b111}: instruction_o.op = ariane_pkg::REMU;\n-                            {7'b000_0100, 3'b100}: instruction_o.op = ariane_pkg::ZEXTH;\n                             default: begin\n                                 illegal_instr_non_bm = 1'b1;\n                             end\n@@ -537,6 +536,8 @@ module decoder import ariane_pkg::*; (\n                                 // Bitwise Shifting\n                                 {7'b011_0000, 3'b001}: instruction_o.op = ariane_pkg::ROL;      // rol\n                                 {7'b011_0000, 3'b101}: instruction_o.op = ariane_pkg::ROR;      // ror\n+                                // Zero Extend Op\n+                                {7'b000_0100, 3'b100}: instruction_o.op = ariane_pkg::ZEXTH;\n                                 default: begin\n                                     illegal_instr_bm = 1'b1;\n                                 end\n@@ -729,7 +730,7 @@ module decoder import ariane_pkg::*; (\n                         3'b000: instruction_o.op  = ariane_pkg::SB;\n                         3'b001: instruction_o.op  = ariane_pkg::SH;\n                         3'b010: instruction_o.op  = ariane_pkg::SW;\n-                        3'b011: if (riscv::XLEN==64) instruction_o.op  = ariane_pkg::SD; \n+                        3'b011: if (riscv::XLEN==64) instruction_o.op  = ariane_pkg::SD;\n                                 else illegal_instr = 1'b1;\n                         default: illegal_instr = 1'b1;\n                     endcase\n@@ -748,7 +749,7 @@ module decoder import ariane_pkg::*; (\n                         3'b100: instruction_o.op  = ariane_pkg::LBU;\n                         3'b101: instruction_o.op  = ariane_pkg::LHU;\n                         3'b110: instruction_o.op  = ariane_pkg::LWU;\n-                        3'b011: if (riscv::XLEN==64) instruction_o.op  = ariane_pkg::LD; \n+                        3'b011: if (riscv::XLEN==64) instruction_o.op  = ariane_pkg::LD;\n                                 else illegal_instr = 1'b1;\n                         default: illegal_instr = 1'b1;\n                     endcase",
+  "rtl_diff_lines": 7,
+  "source": "historical"
+}

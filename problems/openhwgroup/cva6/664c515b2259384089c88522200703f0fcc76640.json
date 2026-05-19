@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/664c515b2259384089c88522200703f0fcc76640",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "664c515b2259384089c88522200703f0fcc76640",
+  "buggy_rtl_commit": "c19a3c1ace6b6c4b4f85f7e5726b8c90e540b0ef",
+  "fix_commit_msg": "Fix decoding of CLRI, BINVI, BSETI, BEXTI and RORI where bit 25 is reserved in RV32 (#2728)\n\nFix decoding of some bitmanip instruction where decoding differs between rv32 and rv64.\nCo-authored-by: JeanRochCoulon <jean-roch.coulon@thalesgroup.com>",
+  "description": "Fix decoding of CLRI, BINVI, BSETI, BEXTI and RORI where bit 25 is reserved in RV32 (#2728)\n\nFix decoding of some bitmanip instruction where decoding differs between rv32 and rv64.\nCo-authored-by: JeanRochCoulon <jean-roch.coulon@thalesgroup.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_664c515b.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 2d137648..169c9b62 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -916,9 +916,18 @@ module decoder\n                   else if (instr.instr[24:20] == 5'b00000) instruction_o.op = ariane_pkg::CLZ;\n                   else if (instr.instr[24:20] == 5'b00001) instruction_o.op = ariane_pkg::CTZ;\n                   else illegal_instr_bm = 1'b1;\n-                end else if (instr.instr[31:26] == 6'b010010) instruction_o.op = ariane_pkg::BCLRI;\n-                else if (instr.instr[31:26] == 6'b011010) instruction_o.op = ariane_pkg::BINVI;\n-                else if (instr.instr[31:26] == 6'b001010) instruction_o.op = ariane_pkg::BSETI;\n+                end else if (CVA6Cfg.IS_XLEN64 && instr.instr[31:26] == 6'b010010)\n+                  instruction_o.op = ariane_pkg::BCLRI;\n+                else if (CVA6Cfg.IS_XLEN32 && instr.instr[31:25] == 7'b0100100)\n+                  instruction_o.op = ariane_pkg::BCLRI;\n+                else if (CVA6Cfg.IS_XLEN64 && instr.instr[31:26] == 6'b011010)\n+                  instruction_o.op = ariane_pkg::BINVI;\n+                else if (CVA6Cfg.IS_XLEN32 && instr.instr[31:25] == 7'b0110100)\n+                  instruction_o.op = ariane_pkg::BINVI;\n+                else if (CVA6Cfg.IS_XLEN64 && instr.instr[31:26] == 6'b001010)\n+                  instruction_o.op = ariane_pkg::BSETI;\n+                else if (CVA6Cfg.IS_XLEN32 && instr.instr[31:25] == 7'b0010100)\n+                  instruction_o.op = ariane_pkg::BSETI;\n                 else if (CVA6Cfg.ZKN && instr.instr[31:20] == 12'b000010001111)\n                   instruction_o.op = ariane_pkg::ZIP;\n                 else illegal_instr_bm = 1'b1;\n@@ -929,8 +938,14 @@ module decoder\n                   instruction_o.op = ariane_pkg::REV8;\n                 else if (instr.instr[31:20] == 12'b011010011000)\n                   instruction_o.op = ariane_pkg::REV8;\n-                else if (instr.instr[31:26] == 6'b010_010) instruction_o.op = ariane_pkg::BEXTI;\n-                else if (instr.instr[31:26] == 6'b011_000) instruction_o.op = ariane_pkg::RORI;\n+                else if (CVA6Cfg.IS_XLEN64 && instr.instr[31:26] == 6'b010_010)\n+                  instruction_o.op = ariane_pkg::BEXTI;\n+                else if (CVA6Cfg.IS_XLEN32 && instr.instr[31:25] == 7'b010_0100)\n+                  instruction_o.op = ariane_pkg::BEXTI;\n+                else if (CVA6Cfg.IS_XLEN64 && instr.instr[31:26] == 6'b011_000)\n+                  instruction_o.op = ariane_pkg::RORI;\n+                else if (CVA6Cfg.IS_XLEN32 && instr.instr[31:25] == 7'b011_0000)\n+                  instruction_o.op = ariane_pkg::RORI;\n                 else if (CVA6Cfg.ZKN && instr.instr[31:20] == 12'b011010000111)\n                   instruction_o.op = ariane_pkg::BREV8;\n                 else if (CVA6Cfg.ZKN && instr.instr[31:20] == 12'b000010001111)",
+  "rtl_diff_lines": 25,
+  "source": "historical"
+}

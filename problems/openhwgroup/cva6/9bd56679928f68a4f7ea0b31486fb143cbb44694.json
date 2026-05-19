@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/9bd56679928f68a4f7ea0b31486fb143cbb44694",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "9bd56679928f68a4f7ea0b31486fb143cbb44694",
+  "buggy_rtl_commit": "527a989542dd101095ba8bb0a341be8f496767fe",
+  "fix_commit_msg": "decoder.sv: fix ZEXT.H instruction (fix #1758, #1975, #2010) (#2032)\n\n- add missing ZEXT.H for RV64\n- fix ZEXT.H for RV32: bit[24:20] shall be 0",
+  "description": "decoder.sv: fix ZEXT.H instruction (fix #1758, #1975, #2010) (#2032)\n\n- add missing ZEXT.H for RV64\n- fix ZEXT.H for RV32: bit[24:20] shall be 0",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_9bd56679.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 9ae74463..233513e0 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -78,7 +78,7 @@ module decoder\n     input logic vtw_i,\n     // Trap sret - CSR_REGFILE\n     input logic tsr_i,\n-    // Hypervisor user mode - CSR_REGFILE \n+    // Hypervisor user mode - CSR_REGFILE\n     input logic hu_i,\n     // Instruction to be added to scoreboard entry - ISSUE_STAGE\n     output scoreboard_entry_t instruction_o,\n@@ -776,8 +776,14 @@ module decoder\n                 // Bitwise Shifting\n                 {7'b011_0000, 3'b001} : instruction_o.op = ariane_pkg::ROL;  // rol\n                 {7'b011_0000, 3'b101} : instruction_o.op = ariane_pkg::ROR;  // ror\n-                // Zero Extend Op\n-                {7'b000_0100, 3'b100} : instruction_o.op = ariane_pkg::ZEXTH;\n+                // Zero Extend Op RV32 encoding\n+                {\n+                  7'b000_0100, 3'b100\n+                } : begin\n+                  if (!CVA6Cfg.IS_XLEN64 && instr.instr[24:20] == 5'b00000)\n+                    instruction_o.op = ariane_pkg::ZEXTH;\n+                  else illegal_instr_bm = 1'b1;\n+                end\n                 default: begin\n                   illegal_instr_bm = 1'b1;\n                 end\n@@ -845,6 +851,14 @@ module decoder\n                 // Bitwise Shifting\n                 {7'b011_0000, 3'b001}: instruction_o.op = ariane_pkg::ROLW;     // rolw\n                 {7'b011_0000, 3'b101}: instruction_o.op = ariane_pkg::RORW;     // rorw\n+                // Zero Extend Op RV64 encoding\n+                {7'b000_0100, 3'b100}:\n+                begin\n+                  if (instr.instr[24:20] == 5'b00000)\n+                    instruction_o.op = ariane_pkg::ZEXTH;\n+                  else\n+                    illegal_instr_bm = 1'b1;\n+                end\n                 default: illegal_instr_bm = 1'b1;\n               endcase\n               illegal_instr = illegal_instr_non_bm & illegal_instr_bm;",
+  "rtl_diff_lines": 20,
+  "source": "historical"
+}

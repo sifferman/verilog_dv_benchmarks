@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/123807955215ff8fff0078e72dc479286de5c4ff",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "123807955215ff8fff0078e72dc479286de5c4ff",
+  "buggy_rtl_commit": "bd5f1f99c0621b39ecd9ef1532edb89d7b658878",
+  "fix_commit_msg": "Add MSTATUSH register for RV32 (fix #1160) (#1328)\n\nCo-authored-by: Frikha Mohamed Aziz <mohamed-aziz.frikha@thalesgroup.com>",
+  "description": "Add MSTATUSH register for RV32 (fix #1160) (#1328)\n\nCo-authored-by: Frikha Mohamed Aziz <mohamed-aziz.frikha@thalesgroup.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/csr_regfile.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_12380795.sh"
+  ],
+  "rtl_diff": "diff --git a/core/csr_regfile.sv b/core/csr_regfile.sv\nindex 78f47538..c28af662 100644\n--- a/core/csr_regfile.sv\n+++ b/core/csr_regfile.sv\n@@ -241,6 +241,7 @@ module csr_regfile import ariane_pkg::*; #(\n                 end\n                 // machine mode registers\n                 riscv::CSR_MSTATUS:            csr_rdata = mstatus_extended;\n+                riscv::CSR_MSTATUSH:           if (riscv::XLEN == 32) csr_rdata = '0; else read_access_exception = 1'b1;\n                 riscv::CSR_MISA:               csr_rdata = ISA_CODE;\n                 riscv::CSR_MEDELEG:            csr_rdata = medeleg_q;\n                 riscv::CSR_MIDELEG:            csr_rdata = mideleg_q;\n@@ -684,6 +685,7 @@ module csr_regfile import ariane_pkg::*; #(\n                     // this register has side-effects on other registers, flush the pipeline\n                     flush_o        = 1'b1;\n                 end\n+                riscv::CSR_MSTATUSH: if (riscv::XLEN != 32) update_access_exception = 1'b1;\n                 // MISA is WARL (Write Any Value, Reads Legal Value)\n                 riscv::CSR_MISA:;\n                 // machine exception delegation register\ndiff --git a/core/include/riscv_pkg.sv b/core/include/riscv_pkg.sv\nindex f25849b6..97d02772 100644\n--- a/core/include/riscv_pkg.sv\n+++ b/core/include/riscv_pkg.sv\n@@ -397,6 +397,7 @@ package riscv;\n         CSR_MIE            = 12'h304,\n         CSR_MTVEC          = 12'h305,\n         CSR_MCOUNTEREN     = 12'h306,\n+        CSR_MSTATUSH       = 12'h310,\n         CSR_MCOUNTINHIBIT  = 12'h320,\n         CSR_MHPM_EVENT_3   = 12'h323,  //Machine performance monitoring Event Selector\n         CSR_MHPM_EVENT_4   = 12'h324,  //Machine performance monitoring Event Selector",
+  "rtl_diff_lines": 3,
+  "source": "historical"
+}

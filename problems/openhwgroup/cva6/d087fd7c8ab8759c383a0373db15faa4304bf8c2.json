@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/d087fd7c8ab8759c383a0373db15faa4304bf8c2",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "d087fd7c8ab8759c383a0373db15faa4304bf8c2",
+  "buggy_rtl_commit": "3fcb7b9c9b4f46fa33387f6a699fe1da29dc9afb",
+  "fix_commit_msg": "[HOT FIX] Add else to SRET instruction decode (#1595)\n\nAdd the generation of illegal instruction in case of SRET decoding and supervisor mode disable",
+  "description": "[HOT FIX] Add else to SRET instruction decode (#1595)\n\nAdd the generation of illegal instruction in case of SRET decoding and supervisor mode disable",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_d087fd7c.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 4948512d..e344c9ce 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -158,6 +158,9 @@ module decoder\n                       //  do not change privilege level if this is an illegal instruction\n                       instruction_o.op = ariane_pkg::ADD;\n                     end\n+                  end else begin\n+                    illegal_instr = 1'b1;\n+                    instruction_o.op = ariane_pkg::ADD;\n                   end\n                 end\n                 // MRET",
+  "rtl_diff_lines": 3,
+  "source": "historical"
+}

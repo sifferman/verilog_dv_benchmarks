@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/b48a2bb63d6fc3ca7ed1dd655373babbacb017c6",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "b48a2bb63d6fc3ca7ed1dd655373babbacb017c6",
+  "buggy_rtl_commit": "1c6da9b739978f1948afef24b1773c832b617496",
+  "fix_commit_msg": "[CSR] Fix bits when RVS and RVU not available (#2074)",
+  "description": "[CSR] Fix bits when RVS and RVU not available (#2074)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/csr_regfile.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_b48a2bb6.sh"
+  ],
+  "rtl_diff": "diff --git a/core/csr_regfile.sv b/core/csr_regfile.sv\nindex fb892d80..c9de0037 100644\n--- a/core/csr_regfile.sv\n+++ b/core/csr_regfile.sv\n@@ -773,7 +773,8 @@ module csr_regfile\n           // -> last bit of pmpaddr must be set 0/1 based on the mode:\n           // NA4, NAPOT: 1\n           // TOR, OFF:   0\n-          if (pmpcfg_q[index].addr_mode[1] == 1'b1) csr_rdata = pmpaddr_q[index][CVA6Cfg.PLEN-3:0];\n+          if (pmpcfg_q[index].addr_mode[1] == 1'b1 || pmpcfg_q[index].addr_mode == 'h0)\n+            csr_rdata = pmpaddr_q[index][CVA6Cfg.PLEN-3:0];\n           else csr_rdata = {pmpaddr_q[index][CVA6Cfg.PLEN-3:1], 1'b0};\n         end\n         default: read_access_exception = 1'b1;\n@@ -1249,6 +1250,18 @@ module csr_regfile\n           if (!CVA6Cfg.RVV) begin\n             mstatus_d.vs = riscv::Off;\n           end\n+          if (!CVA6Cfg.RVS) begin\n+            mstatus_d.sie  = riscv::Off;\n+            mstatus_d.spie = riscv::Off;\n+            mstatus_d.spp  = riscv::Off;\n+            mstatus_d.sum  = riscv::Off;\n+            mstatus_d.mxr  = riscv::Off;\n+            mstatus_d.tvm  = riscv::Off;\n+            mstatus_d.tsr  = riscv::Off;\n+          end\n+          if (!CVA6Cfg.RVU) begin\n+            mstatus_d.mprv = riscv::Off;\n+          end\n           // If h-extension is not enabled, priv level HS is reserved\n           if (!CVA6Cfg.RVH) begin\n             if (mstatus_d.mpp == riscv::PRIV_LVL_HS) begin",
+  "rtl_diff_lines": 15,
+  "source": "historical"
+}

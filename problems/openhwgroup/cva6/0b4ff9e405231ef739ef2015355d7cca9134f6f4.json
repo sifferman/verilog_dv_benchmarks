@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/0b4ff9e405231ef739ef2015355d7cca9134f6f4",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "0b4ff9e405231ef739ef2015355d7cca9134f6f4",
+  "buggy_rtl_commit": "c23eed54152cd881d6f73a29a39c2bb7d637531c",
+  "fix_commit_msg": "fix fence(.i) decoder (#923)",
+  "description": "fix fence(.i) decoder (#923)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_0b4ff9e4.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex cb792454..5ef8bd47 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -238,9 +238,6 @@ module decoder import ariane_pkg::*; (\n \n                         default: illegal_instr = 1'b1;\n                     endcase\n-\n-                    if (instr.stype.rs1 != '0 || instr.stype.imm0 != '0 || instr.instr[31:28] != '0)\n-                        illegal_instr = 1'b1;\n                 end\n \n                 // --------------------------",
+  "rtl_diff_lines": 3,
+  "source": "historical"
+}

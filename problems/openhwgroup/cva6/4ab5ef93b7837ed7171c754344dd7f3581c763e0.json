@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/4ab5ef93b7837ed7171c754344dd7f3581c763e0",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "4ab5ef93b7837ed7171c754344dd7f3581c763e0",
+  "buggy_rtl_commit": "0b4ff9e405231ef739ef2015355d7cca9134f6f4",
+  "fix_commit_msg": "fix dret decoder (#922)",
+  "description": "fix dret decoder (#922)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "core",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_4ab5ef93.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 5ef8bd47..bac7089b 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -136,7 +136,7 @@ module decoder import ariane_pkg::*; (\n                                 12'b111_1011_0010: begin\n                                     instruction_o.op = ariane_pkg::DRET;\n                                     // check that we are in debug mode when executing this instruction\n-                                    illegal_instr = (!debug_mode_i) ? 1'b1 : 1'b0;\n+                                    illegal_instr = (!debug_mode_i) ? 1'b1 : illegal_instr;\n                                 end\n                                 // WFI\n                                 12'b1_0000_0101: begin",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

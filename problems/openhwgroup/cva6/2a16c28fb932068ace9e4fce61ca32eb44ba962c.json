@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/2a16c28fb932068ace9e4fce61ca32eb44ba962c",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "2a16c28fb932068ace9e4fce61ca32eb44ba962c",
+  "buggy_rtl_commit": "6f4258eaee4f56525a00ee5fbd1ab84bb6088215",
+  "fix_commit_msg": "decoder: fix CPOPW/CLZW/CTZW decoder (#3169) (#3171)\n\nbits [24:22] must be equal to 0 for some B instructions according to the specification.\n\nhttps://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/#insns-cpopw\n\n\nCo-authored-by: oChunCai <jiatianyu61@gmail.com>\nCo-authored-by: JeanRochCoulon <jean-roch.coulon@thalesgroup.com>",
+  "description": "decoder: fix CPOPW/CLZW/CTZW decoder (#3169) (#3171)\n\nbits [24:22] must be equal to 0 for some B instructions according to the specification.\n\nhttps://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/#insns-cpopw\n\n\nCo-authored-by: oChunCai <jiatianyu61@gmail.com>\nCo-authored-by: JeanRochCoulon <jean-roch.coulon@thalesgroup.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_2a16c28f.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex fce3695d..874541f4 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -1258,9 +1258,9 @@ module decoder\n               unique case (instr.itype.funct3)\n                 3'b001: begin\n                   if (instr.instr[31:25] == 7'b0110000) begin\n-                    if (instr.instr[21:20] == 2'b10) instruction_o.op = ariane_pkg::CPOPW;\n-                    else if (instr.instr[21:20] == 2'b00) instruction_o.op = ariane_pkg::CLZW;\n-                    else if (instr.instr[21:20] == 2'b01) instruction_o.op = ariane_pkg::CTZW;\n+                    if (instr.instr[24:20] == 5'b00010) instruction_o.op = ariane_pkg::CPOPW;\n+                    else if (instr.instr[24:20] == 5'b00000) instruction_o.op = ariane_pkg::CLZW;\n+                    else if (instr.instr[24:20] == 5'b00001) instruction_o.op = ariane_pkg::CTZW;\n                     else illegal_instr_bm = 1'b1;\n                   end else if (instr.instr[31:26] == 6'b000010) begin\n                     instruction_o.op = ariane_pkg::SLLIUW; // Shift Left Logic by Immediate (Unsigned Word)",
+  "rtl_diff_lines": 6,
+  "source": "historical"
+}

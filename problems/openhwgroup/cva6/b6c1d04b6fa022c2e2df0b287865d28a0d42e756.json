@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/b6c1d04b6fa022c2e2df0b287865d28a0d42e756",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "b6c1d04b6fa022c2e2df0b287865d28a0d42e756",
+  "buggy_rtl_commit": "56ccf8089e80e5c7950038cad5796e50c64aa0c2",
+  "fix_commit_msg": "decoder.sv: fix sfence.vma when rs1 != 0 (#933)\n\nunlike other instructions with minor opcode == PRIV,\nSFENCE.VMA do not check for rs1 != 0.\nOnly check for rd !=0 to raise illegal instruction\n\nSigned-off-by: Guillaume Chauvon <guillaume.chauvon@thalesgroup.com>",
+  "description": "decoder.sv: fix sfence.vma when rs1 != 0 (#933)\n\nunlike other instructions with minor opcode == PRIV,\nSFENCE.VMA do not check for rs1 != 0.\nOnly check for rd !=0 to raise illegal instruction\n\nSigned-off-by: Guillaume Chauvon <guillaume.chauvon@thalesgroup.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "core",
+  "rtl_files_changed": [
+    "core/decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_b6c1d04b.sh"
+  ],
+  "rtl_diff": "diff --git a/core/decoder.sv b/core/decoder.sv\nindex 7c1e2ba1..06508103 100644\n--- a/core/decoder.sv\n+++ b/core/decoder.sv\n@@ -158,7 +158,7 @@ module decoder import ariane_pkg::*; (\n                                     if (instr.instr[31:25] == 7'b1001) begin\n                                         // check privilege level, SFENCE.VMA can only be executed in M/S mode\n                                         // otherwise decode an illegal instruction\n-                                        illegal_instr    = (priv_lvl_i inside {riscv::PRIV_LVL_M, riscv::PRIV_LVL_S}) ? illegal_instr : 1'b1;\n+                                        illegal_instr    = ((priv_lvl_i inside {riscv::PRIV_LVL_M, riscv::PRIV_LVL_S}) && instr.itype.rd == '0) ? 1'b0 : 1'b1;\n                                         instruction_o.op = ariane_pkg::SFENCE_VMA;\n                                         // check TVM flag and intercept SFENCE.VMA call if necessary\n                                         if (priv_lvl_i == riscv::PRIV_LVL_S && tvm_i)",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

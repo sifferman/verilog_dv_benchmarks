@@ -454,6 +454,84 @@ Do **not** use it for:
 
 ---
 
+## Phase 4.7 — cva6-specific patterns
+
+cva6 evolves rapidly and ships in multiple eras. When mining decoder-style
+bugs, three patterns recur:
+
+### Era selection (per-fix_commit)
+
+cva6's decoder/branch_unit module signatures shift across three eras:
+
+- **Era A** (≤ 2022-09): non-parametric `decoder`/`compressed_decoder`. Needs
+  `corev_apu/riscv-dbg/src/dm_pkg.sv` + `core/include/ariane_rvfi_pkg.sv` in
+  the compile list.
+- **Era B** (2023-11 → 2024-02): decoder takes `parameter CVA6Cfg` but no
+  parametric types. `cva6_config_pkg::cva6_cfg` is already a `cva6_cfg_t`
+  struct at this era. Needs `core/include/config_pkg.sv` + the chosen
+  `cv32a6_*_config_pkg.sv`. No build_config_pkg, no rvfi/dm pkg.
+- **Era C** (≥ 2024-04): decoder takes `parameter CVA6Cfg` *and* parametric
+  types (`branchpredict_sbe_t`, `exception_t`, `irq_ctrl_t`,
+  `scoreboard_entry_t`, `interrupts_t`, `INTERRUPTS`). Needs
+  `build_config_pkg.sv`. The type defs are factored into
+  `problems/openhwgroup/cva6/cva6_eraC_decoder_types.svh` — include it from
+  every era-C decoder TB so you skip ~80 lines of struct plumbing per bug.
+
+Per-era file lists you'll need in the verilator command line:
+```
+# Era A
+core/include/riscv_pkg.sv  cv32a6_*_config_pkg.sv  riscv-dbg/src/dm_pkg.sv
+ariane_rvfi_pkg.sv  ariane_pkg.sv  decoder.sv
+# Era B
+core/include/riscv_pkg.sv  config_pkg.sv  cv32a6_*_config_pkg.sv
+ariane_pkg.sv  decoder.sv
+# Era C
+core/include/riscv_pkg.sv  config_pkg.sv  cv32a6_*_config_pkg.sv
+build_config_pkg.sv  ariane_pkg.sv  decoder.sv  (+incdir+$SCRIPT_DIR)
+```
+
+### Picking the config — the CvxifEn=0 trap
+
+cva6's decoder gates `instruction_o.ex.valid` behind `CVA6Cfg.CvxifEn=0`
+(see decoder.sv line ~1347 at master:
+`if (!CVA6Cfg.CvxifEn) instruction_o.ex.valid = 1'b1;`). So if you pick a
+config with `CvxifEn=1`, the decoder's `illegal_instr` signal exists but
+never reaches `ex.valid` — your unit TB sees `ex.valid=0` regardless of
+the bug. This affects every era-B/C bug that requires `RVS=0`, `RVU=0`, or
+`DebugEn=0`, because every cv32a6 config with one of those features off
+also has `CvxifEn=1`.
+
+**Workaround**: observe the decoder's internal `illegal_instr` via a
+cross-module reference. `logic illegal_instr;` is declared at module scope
+in decoder.sv (line ~94), so `dut.illegal_instr` is accessible from the TB
+with Verilator. Use that signal in your PASS/FAIL check whenever the bug
+needs a `CvxifEn=1` config (typically: `cv32a6_embedded` for RVS/DebugEn=0,
+`cv32a65x` for RVB=1 at older eras).
+
+### Which config exposes which bug
+
+| Bug-trigger feature | cv32a6 config | CvxifEn | observability |
+|---|---|---|---|
+| Default (RVS, RVU, MMU) | `cv32a6_imac_sv32` | 0 | `instruction_o.ex.valid` |
+| RVC off | `cv32a6_ima_sv32_fpga` | 0 | `instruction_o.ex.valid` |
+| F extension (RVF) | `cv32a6_imafc_sv32` | 0 | `instruction_o.ex.valid` |
+| RVS=0 or RVU=0 or DebugEn=0 | `cv32a6_embedded` | 1 | `dut.illegal_instr` peek |
+| RVB=1 (era B+) | `cv32a65x` | 1 | `dut.illegal_instr` peek |
+| Zcb (c.sh, c.lh, etc.) | `cv32a60x` | 1 | `dut.illegal_instr` peek |
+| RV64 + Zbb (CPOPW etc.) | `cv64a6_imafdc_sv39` | 1 | `dut.illegal_instr` peek |
+
+### Bugs that don't unit-test cleanly
+
+Some decoder fixes only change which valid op a non-illegal encoding maps
+to (e.g., 9bd56679 maps ZEXT.H-with-rs2!=0 from `op=ZEXTH` to `op=PACK`
+under `ZKN=1`). For these you can't watch `illegal_instr`; you have to
+watch `instruction_o.op`. Pick a config with the fall-through feature
+disabled (e.g., `ZKN=0`) if one exists; otherwise the bug isn't observable
+through unit-level signals at all and you should skip or use the `.S`
+harness on a full CPU.
+
+---
+
 ## Phase 5 — Iterate all repos from `./repos`
 
 When called without arguments, process every non-blank, non-comment line in
