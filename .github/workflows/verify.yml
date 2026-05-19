@@ -8,7 +8,7 @@ on:
 env:
   # Prebuilt rv32i toolchain (matches what picorv32, nerv, and many other
   # small RISC-V cores expect for firmware builds).
-  RISCV32_TOOLCHAIN_URL: https://github.com/stnolting/riscv-gcc-prebuilt/releases/download/rv32i-4.0.0/riscv32-unknown-elf.gcc-13.2.0.tar.gz
+  RISCV32_TOOLCHAIN_URL: https://github.com/stnolting/riscv-gcc-prebuilt/releases/download/rv32i-131023/riscv32-unknown-elf.gcc-13.2.0.tar.gz
 
 jobs:
   VerifyAll:
