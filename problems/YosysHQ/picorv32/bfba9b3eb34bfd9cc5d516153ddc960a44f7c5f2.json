@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/bfba9b3eb34bfd9cc5d516153ddc960a44f7c5f2",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "bfba9b3eb34bfd9cc5d516153ddc960a44f7c5f2",
+  "buggy_rtl_commit": "b9ed4364d445fba65b206d9c186f16456975ff36",
+  "fix_commit_msg": "Bugfix in picorv32_pcpi_fast_mul",
+  "description": "Bugfix in picorv32_pcpi_fast_mul",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_bfba9b3e.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex fe45e18..d8c088f 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -1909,7 +1909,7 @@ module picorv32_pcpi_fast_mul (\n \tend\n \n \talways @(posedge clk) begin\n-\t\trd <= rs1 * rs2;\n+\t\trd <= $signed(rs1) * $signed(rs2);\n \tend\n \n \talways @(posedge clk) begin",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

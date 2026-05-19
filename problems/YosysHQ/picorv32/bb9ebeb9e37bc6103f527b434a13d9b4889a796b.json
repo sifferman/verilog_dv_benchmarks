@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/bb9ebeb9e37bc6103f527b434a13d9b4889a796b",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "bb9ebeb9e37bc6103f527b434a13d9b4889a796b",
+  "buggy_rtl_commit": "436544ccab9dcef61d074feda19e52c94fdb5c1b",
+  "fix_commit_msg": "Fixed jalr, c_jalr, and c_jr insns (bug discovered by riscv-formal)",
+  "description": "Fixed jalr, c_jalr, and c_jr insns (bug discovered by riscv-formal)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_bb9ebeb9.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex ba9fc0a..8c7b5b8 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -1175,7 +1175,7 @@ module picorv32 #(\n \treg [regindex_bits-1:0] latched_rd;\n \n \treg [31:0] current_pc;\n-\tassign next_pc = latched_store && latched_branch ? reg_out : reg_next_pc;\n+\tassign next_pc = latched_store && latched_branch ? reg_out & ~1 : reg_next_pc;\n \n \treg [3:0] pcpi_timeout_counter;\n \treg pcpi_timeout;\n@@ -1430,7 +1430,7 @@ module picorv32 #(\n \t\t\t\t(* parallel_case *)\n \t\t\t\tcase (1'b1)\n \t\t\t\t\tlatched_branch: begin\n-\t\t\t\t\t\tcurrent_pc = latched_store ? (latched_stalu ? alu_out_q : reg_out) : reg_next_pc;\n+\t\t\t\t\t\tcurrent_pc = latched_store ? (latched_stalu ? alu_out_q : reg_out) & ~1 : reg_next_pc;\n \t\t\t\t\t\t`debug($display(\"ST_RD:  %2d 0x%08x, BRANCH 0x%08x\", latched_rd, reg_pc + (latched_compr ? 2 : 4), current_pc);)\n \t\t\t\t\tend\n \t\t\t\t\tlatched_store && !latched_branch: begin",
+  "rtl_diff_lines": 4,
+  "source": "historical"
+}

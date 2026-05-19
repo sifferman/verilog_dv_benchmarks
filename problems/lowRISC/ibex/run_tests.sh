@@ -60,6 +60,9 @@ INCDIRS=(
 )
 
 MDIR="/tmp/vbuild_ibex_${TOP}"
+# Wipe the cache so stale Vtb_*.mk paths from earlier clone layouts don't
+# survive into a fresh run.
+rm -rf "$MDIR"
 mkdir -p "$MDIR"
 
 verilator --binary \

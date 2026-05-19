@@ -13,6 +13,10 @@ PRIM_RTL="$REPO_DIR/hw/ip/prim/rtl"
 
 TOP="${TOP_MODULE:-tb_prim_fifo_sync_depth0}"
 MDIR="/tmp/vbuild_ot_${TOP}"
+# Wipe the cache so stale Vtb_*.mk paths from earlier clone layouts don't
+# survive into a fresh run.
+rm -rf "$MDIR"
+mkdir -p "$MDIR"
 
 case "$TOP" in
   tb_prim_subreg_rc)

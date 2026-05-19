@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/436544ccab9dcef61d074feda19e52c94fdb5c1b",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "436544ccab9dcef61d074feda19e52c94fdb5c1b",
+  "buggy_rtl_commit": "cd30db3425a08261f749523dff1f60f396143e37",
+  "fix_commit_msg": "Fix decoding of C.ADDI instruction\n\nSee https://groups.google.com/a/groups.riscv.org/forum/#!topic/isa-dev/mr3H6S6IIts\nfor discussion. There was a bug in the ISA manual.",
+  "description": "Fix decoding of C.ADDI instruction\n\nSee https://groups.google.com/a/groups.riscv.org/forum/#!topic/isa-dev/mr3H6S6IIts\nfor discussion. There was a bug in the ISA manual.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_436544cc.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex 6de2bd4..ba9fc0a 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -890,11 +890,9 @@ module picorv32 #(\n \t\t\t\t\t2'b01: begin // Quadrant 1\n \t\t\t\t\t\tcase (mem_rdata_latched[15:13])\n \t\t\t\t\t\t\t3'b000: begin // C.NOP / C.ADDI\n-\t\t\t\t\t\t\t\tif (!mem_rdata_latched[12:2] || mem_rdata_latched[11:7]) begin\n-\t\t\t\t\t\t\t\t\tis_alu_reg_imm <= 1;\n-\t\t\t\t\t\t\t\t\tdecoded_rd <= mem_rdata_latched[11:7];\n-\t\t\t\t\t\t\t\t\tdecoded_rs1 <= mem_rdata_latched[11:7];\n-\t\t\t\t\t\t\t\tend\n+\t\t\t\t\t\t\t\tis_alu_reg_imm <= 1;\n+\t\t\t\t\t\t\t\tdecoded_rd <= mem_rdata_latched[11:7];\n+\t\t\t\t\t\t\t\tdecoded_rs1 <= mem_rdata_latched[11:7];\n \t\t\t\t\t\t\tend\n \t\t\t\t\t\t\t3'b001: begin // C.JAL\n \t\t\t\t\t\t\t\tinstr_jal <= 1;",
+  "rtl_diff_lines": 8,
+  "source": "historical"
+}

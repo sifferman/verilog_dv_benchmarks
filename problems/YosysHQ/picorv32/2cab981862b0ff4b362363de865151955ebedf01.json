@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/2cab981862b0ff4b362363de865151955ebedf01",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "2cab981862b0ff4b362363de865151955ebedf01",
+  "buggy_rtl_commit": "094783dcf892d99a7d845c88be744768ac1133eb",
+  "fix_commit_msg": "Fixed signed division by zero handling",
+  "description": "Fixed signed division by zero handling",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_2cab9818.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex d163754..229cd08 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -1638,7 +1638,7 @@ module picorv32_pcpi_div (\n \t\t\trunning <= 1;\n \t\t\tdividend <= (instr_div || instr_rem) && pcpi_rs1[31] ? -pcpi_rs1 : pcpi_rs1;\n \t\t\tdivisor <= ((instr_div || instr_rem) && pcpi_rs2[31] ? -pcpi_rs2 : pcpi_rs2) << 31;\n-\t\t\toutsign <= (instr_div && (pcpi_rs1[31] != pcpi_rs2[31])) || (instr_rem && pcpi_rs1[31]);\n+\t\t\toutsign <= (instr_div && (pcpi_rs1[31] != pcpi_rs2[31]) && |pcpi_rs2) || (instr_rem && pcpi_rs1[31]);\n \t\t\tquotient <= 0;\n \t\t\tquotient_msk <= 1 << 31;\n \t\tend else",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

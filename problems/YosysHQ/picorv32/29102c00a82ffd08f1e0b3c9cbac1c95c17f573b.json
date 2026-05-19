@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/29102c00a82ffd08f1e0b3c9cbac1c95c17f573b",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "29102c00a82ffd08f1e0b3c9cbac1c95c17f573b",
+  "buggy_rtl_commit": "f00a88c36eaab478b64ee27d8162e421049bcc66",
+  "fix_commit_msg": "Bugfix: decode fence instruction",
+  "description": "Bugfix: decode fence instruction",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_29102c00.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex cfc7ce0..f13cea9 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -648,7 +648,7 @@ module picorv32 #(\n \treg instr_lb, instr_lh, instr_lw, instr_lbu, instr_lhu, instr_sb, instr_sh, instr_sw;\n \treg instr_addi, instr_slti, instr_sltiu, instr_xori, instr_ori, instr_andi, instr_slli, instr_srli, instr_srai;\n \treg instr_add, instr_sub, instr_sll, instr_slt, instr_sltu, instr_xor, instr_srl, instr_sra, instr_or, instr_and;\n-\treg instr_rdcycle, instr_rdcycleh, instr_rdinstr, instr_rdinstrh, instr_ecall_ebreak;\n+\treg instr_rdcycle, instr_rdcycleh, instr_rdinstr, instr_rdinstrh, instr_ecall_ebreak, instr_fence;\n \treg instr_getq, instr_setq, instr_retirq, instr_maskirq, instr_waitirq, instr_timer;\n \twire instr_trap;\n \n@@ -680,7 +680,7 @@ module picorv32 #(\n \t\t\tinstr_lb, instr_lh, instr_lw, instr_lbu, instr_lhu, instr_sb, instr_sh, instr_sw,\n \t\t\tinstr_addi, instr_slti, instr_sltiu, instr_xori, instr_ori, instr_andi, instr_slli, instr_srli, instr_srai,\n \t\t\tinstr_add, instr_sub, instr_sll, instr_slt, instr_sltu, instr_xor, instr_srl, instr_sra, instr_or, instr_and,\n-\t\t\tinstr_rdcycle, instr_rdcycleh, instr_rdinstr, instr_rdinstrh,\n+\t\t\tinstr_rdcycle, instr_rdcycleh, instr_rdinstr, instr_rdinstrh, instr_fence,\n \t\t\tinstr_getq, instr_setq, instr_retirq, instr_maskirq, instr_waitirq, instr_timer};\n \n \twire is_rdcycle_rdcycleh_rdinstr_rdinstrh;\n@@ -746,6 +746,7 @@ module picorv32 #(\n \t\tif (instr_rdcycleh) new_ascii_instr = \"rdcycleh\";\n \t\tif (instr_rdinstr)  new_ascii_instr = \"rdinstr\";\n \t\tif (instr_rdinstrh) new_ascii_instr = \"rdinstrh\";\n+\t\tif (instr_fence)    new_ascii_instr = \"fence\";\n \n \t\tif (instr_getq)     new_ascii_instr = \"getq\";\n \t\tif (instr_setq)     new_ascii_instr = \"setq\";\n@@ -1083,6 +1084,7 @@ module picorv32 #(\n \n \t\t\tinstr_ecall_ebreak <= ((mem_rdata_q[6:0] == 7'b1110011 && !mem_rdata_q[31:21] && !mem_rdata_q[19:7]) ||\n \t\t\t\t\t(COMPRESSED_ISA && mem_rdata_q[15:0] == 16'h9002));\n+\t\t\tinstr_fence <= (mem_rdata_q[6:0] == 7'b0001111 && !mem_rdata_q[14:12]);\n \n \t\t\tinstr_getq    <= mem_rdata_q[6:0] == 7'b0001011 && mem_rdata_q[31:25] == 7'b0000000 && ENABLE_IRQ && ENABLE_IRQ_QREGS;\n \t\t\tinstr_setq    <= mem_rdata_q[6:0] == 7'b0001011 && mem_rdata_q[31:25] == 7'b0000001 && ENABLE_IRQ && ENABLE_IRQ_QREGS;\n@@ -1158,6 +1160,8 @@ module picorv32 #(\n \t\t\tinstr_sra   <= 0;\n \t\t\tinstr_or    <= 0;\n \t\t\tinstr_and   <= 0;\n+\n+\t\t\tinstr_fence <= 0;\n \t\tend\n \tend",
+  "rtl_diff_lines": 8,
+  "source": "historical"
+}

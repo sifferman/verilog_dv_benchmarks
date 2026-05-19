@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/aa17d587843a78e3d49b5e24bc5e4ab76e8c6383",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "aa17d587843a78e3d49b5e24bc5e4ab76e8c6383",
+  "buggy_rtl_commit": "ef8014eebd35552aa8dde4bfddf9d7e27b5d1645",
+  "fix_commit_msg": "Bugfix in C.SRAI implementation",
+  "description": "Bugfix in C.SRAI implementation",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_aa17d587.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex 8d40052..05c67ba 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -276,7 +276,7 @@ module picorv32 #(\n \t\t\t\t\t\t\t\tmem_rdata_q[31:25] <= 7'b0000000;\n \t\t\t\t\t\t\t\tmem_rdata_q[14:12] <= 3'b 101;\n \t\t\t\t\t\t\tend\n-\t\t\t\t\t\t\tif (mem_rdata_latched[11:10] == 2'b00) begin // C.SRAI\n+\t\t\t\t\t\t\tif (mem_rdata_latched[11:10] == 2'b01) begin // C.SRAI\n \t\t\t\t\t\t\t\tmem_rdata_q[31:25] <= 7'b0100000;\n \t\t\t\t\t\t\t\tmem_rdata_q[14:12] <= 3'b 101;\n \t\t\t\t\t\t\tend",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

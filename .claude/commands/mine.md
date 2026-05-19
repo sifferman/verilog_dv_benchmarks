@@ -319,6 +319,141 @@ runner.
 
 ---
 
+## Phase 4.5 — Focused single-bug testbench (when bundled DV misses the bug)
+
+`try-commit` often reports `test passes with buggy RTL` even for clearly real
+bug-fix commits. This is the **testbench-coverage wall**: the bug is in the
+RTL but the bundled testbench doesn't exercise the buggy code path. Examples
+already encountered:
+
+| Fix commit | Bug | Why bundled tb misses it |
+|---|---|---|
+| picorv32 `29102c0` | `fence` decoded as illegal | bundled tb never executes `fence` |
+| picorv32 `de92ce5` | RV32E shift-amount width truncated | tb runs with `ENABLE_REGS_16_31=1` |
+| picorv32 `7b6aa21` | pcpi_div bug | tb runs with `ENABLE_DIV=0` |
+
+For these cases, build a **focused single-bug runner**: drive a tiny probe
+program against the live RTL using Verilator + C++ DPI, with the fix
+commit's behavior as its own oracle. No `$readmemh`, no hand-encoded hex,
+no Python-side assembler — `riscv32-unknown-elf-as` does the assembling.
+
+### Per-repo shared infrastructure
+
+For each CPU repo, two files are shared across every bug instance:
+
+```
+problems/<owner>/<repo>/
+  run_instructions.sv     # SV TB: clock, reset, DPI bus, watchdog, DUT
+  run_instructions.cpp    # C++ DPI side: memory + oracle, env-var configured
+```
+
+`run_instructions.sv` has no `$readmemh` and no hand-encoded constants.
+Memory accesses go through DPI imports — `dpi_read_word(addr)` for fetches
+and loads, `dpi_observe_write(addr, data, wstrb)` for stores. On `trap`,
+the TB calls `dpi_on_trap()` which returns 0 for PASS or non-0 for FAIL.
+
+DUT parameter knobs are gated by `` `ifdef PARAM_* `` blocks so a per-bug
+runner can opt into a non-default DUT config via `+define+PARAM_RV32E`
+(etc.) without recompiling the RTL or editing the SV.
+
+`run_instructions.cpp` holds the program memory array, the oracle state
+(success_register, success_marker_written), and an env-var-driven init:
+
+| Env var | Purpose |
+|---|---|
+| `PROBE_BIN`      | raw little-endian binary (output of riscv32-as + objcopy) |
+| `EXPECTED_VALUE` | optional: oracle requires this exact 32-bit value at trap |
+| `SUCCESS_ADDR`   | optional: magic write address (default `0x20000000`) |
+
+### Per-bug instance files
+
+```
+  probe_<sha8>.S          # the RISC-V probe — 4-10 instructions
+  run_<sha8>.sh           # bash runner: assemble probe, +define+ params, exec
+  <full_sha>.json         # instance spec; test_commands -> run_<sha8>.sh
+```
+
+`probe_<sha8>.S` follows the magic-address convention: load the success
+address into `a0`, exercise the buggy operation, write a known value to
+`0(a0)`, then `ebreak`. Example:
+
+```asm
+        .text
+        .globl  _start
+_start:
+        lui     a0, 0x20000        # success-marker address
+        fence   iorw, iorw         # the bug — buggy RTL traps here
+        li      a1, 0xCAFE0001     # success value
+        sw      a1, 0(a0)
+        ebreak
+```
+
+`run_<sha8>.sh` shells out to the riscv32 toolchain (path discovered by
+`problems/env.sh`), then verilator-compiles `run_instructions.sv` +
+`run_instructions.cpp` + the RTL, with any `+define+PARAM_*` flags:
+
+```bash
+"$RISCV32_PREFIX-as" -march=rv32i probe_<sha8>.S -o $BUILD/probe.o
+"$RISCV32_PREFIX-objcopy" -O binary -j .text $BUILD/probe.o $BUILD/probe.bin
+verilator --binary --timing -Wno-fatal \
+    --Mdir $BUILD/obj_dir -CFLAGS "-std=c++17" \
+    +define+PARAM_RV32E \
+    --top-module run_instructions -o Vrun_instructions \
+    "$REPO_DIR/picorv32.v" run_instructions.sv run_instructions.cpp
+PROBE_BIN=$BUILD/probe.bin EXPECTED_VALUE=0xCAFE0001 \
+    timeout 30 $BUILD/obj_dir/Vrun_instructions
+```
+
+Use `-march=rv32i` (not `rv32i_zicsr`) for compatibility with older
+toolchains (GCC ≤ 8.x that predates the zicsr split).
+
+### Writing a new focused-bug probe
+
+For an existing CPU repo that already has `run_instructions.{sv,cpp}`:
+
+1. **Identify the bug** from the fix commit + linked issue/PR. Pin down the
+   exact RTL operation and the observable symptom.
+2. **Write `probe_<sha8>.S`** — typically a copy-edit of an existing probe
+   in the same directory.
+3. **Copy an existing `run_<sha8>.sh`** in the same directory and update:
+   build dir name, any `+define+PARAM_*`, `EXPECTED_VALUE`.
+4. **Validate at HEAD**: `bash problems/<owner>/<repo>/run_<sha8>.sh`
+   should PASS.
+5. **`try-commit`** with `--test-cmd "bash problems/.../run_<sha8>.sh"` —
+   the harness reverts RTL to parent and confirms FAIL.
+
+### Bringing a new CPU repo into the pattern
+
+If the repo doesn't yet have `run_instructions.{sv,cpp}`, port one from an
+existing repo (e.g. `problems/YosysHQ/picorv32/`) and update:
+
+- DUT instantiation in `.sv` (port map + parameter knobs)
+- Bus model — picorv32 uses a native ready/valid bus; cores using Wishbone
+  / AXI-Lite need the corresponding handshake in `run_instructions.sv`
+- Memory size / `SUCCESS_ADDR` if the CPU has a different memory map
+- Any extra DPI hooks (e.g. CSR access, IRQ injection) the new oracle needs
+
+The C++ side stays mostly identical — only `dpi_read_word` /
+`dpi_observe_write` semantics shift if the bus protocol differs.
+
+### When to use this pattern
+
+Use it when **all** of the following hold:
+- The commit message clearly describes a behavioral RTL bug.
+- The fix touches a small RTL surface (≤ 50 diff lines).
+- `try-commit` against the bundled DV reports `test passes with buggy RTL`.
+- The bug-revealing operation is expressible as a few instructions or a
+  short directed sequence.
+
+Do **not** use it for:
+- Subtle multi-cycle interactions where you'd need to reimplement most of
+  the testbench infrastructure (write a fixture instead, or skip).
+- Cases where the bundled DV already catches the bug — that's the cheaper
+  path.
+- Style/refactor commits that aren't real bug fixes.
+
+---
+
 ## Phase 5 — Iterate all repos from `./repos`
 
 When called without arguments, process every non-blank, non-comment line in

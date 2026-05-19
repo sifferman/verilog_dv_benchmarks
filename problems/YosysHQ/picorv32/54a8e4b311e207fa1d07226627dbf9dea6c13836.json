@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/54a8e4b311e207fa1d07226627dbf9dea6c13836",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "54a8e4b311e207fa1d07226627dbf9dea6c13836",
+  "buggy_rtl_commit": "17c7da49f48a68cd4197e4580ec0b2954d510b6c",
+  "fix_commit_msg": "Fixed catching jumps to misaligned insn",
+  "description": "Fixed catching jumps to misaligned insn",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_54a8e4b3.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex e7036e1..04d845f 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -1564,7 +1564,7 @@ module picorv32 #(\n \t\t\t\t\t\tlatched_branch <= 1;\n \t\t\t\t\t\tlatched_store <= 1;\n \t\t\t\t\t\t`debug($display(\"LD_RS1: %2d 0x%08x\", decoded_rs1, cpuregs_rs1);)\n-\t\t\t\t\t\treg_out <= cpuregs_rs1;\n+\t\t\t\t\t\treg_out <= CATCH_MISALIGN ? (cpuregs_rs1 & 32'h fffffffe) : cpuregs_rs1;\n \t\t\t\t\t\tdbg_rs1val <= cpuregs_rs1;\n \t\t\t\t\t\tdbg_rs1val_valid <= 1;\n \t\t\t\t\t\tcpu_state <= cpu_state_fetch;\n@@ -1849,12 +1849,14 @@ module picorv32 #(\n \n \t\tirq_pending <= next_irq_pending & ~MASKED_IRQ;\n \n-\t\tif (COMPRESSED_ISA) begin\n-\t\t\treg_pc[0] <= 0;\n-\t\t\treg_next_pc[0] <= 0;\n-\t\tend else begin\n-\t\t\treg_pc[1:0] <= 0;\n-\t\t\treg_next_pc[1:0] <= 0;\n+\t\tif (!CATCH_MISALIGN) begin\n+\t\t\tif (COMPRESSED_ISA) begin\n+\t\t\t\treg_pc[0] <= 0;\n+\t\t\t\treg_next_pc[0] <= 0;\n+\t\t\tend else begin\n+\t\t\t\treg_pc[1:0] <= 0;\n+\t\t\t\treg_next_pc[1:0] <= 0;\n+\t\t\tend\n \t\tend\n \t\tcurrent_pc = 'bx;\n \tend",
+  "rtl_diff_lines": 16,
+  "source": "historical"
+}

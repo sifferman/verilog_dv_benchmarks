@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/ef8014eebd35552aa8dde4bfddf9d7e27b5d1645",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "ef8014eebd35552aa8dde4bfddf9d7e27b5d1645",
+  "buggy_rtl_commit": "f7435eca9639b1a5639867364d88c4fd957a034d",
+  "fix_commit_msg": "Bugfix in C.ADDI4SPN implementation",
+  "description": "Bugfix in C.ADDI4SPN implementation",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_ef8014ee.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex 8a6dbbb..8d40052 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -240,7 +240,7 @@ module picorv32 #(\n \t\t\t\t\tcase (mem_rdata_latched[15:13])\n \t\t\t\t\t\t3'b000: begin // C.ADDI4SPN\n \t\t\t\t\t\t\tmem_rdata_q[14:12] <= 3'b000;\n-\t\t\t\t\t\t\tmem_rdata_q[31:20] <= {mem_rdata_latched[10:7], mem_rdata_latched[12:11], mem_rdata_latched[5], mem_rdata_latched[6]};\n+\t\t\t\t\t\t\tmem_rdata_q[31:20] <= {mem_rdata_latched[10:7], mem_rdata_latched[12:11], mem_rdata_latched[5], mem_rdata_latched[6], 2'b00};\n \t\t\t\t\t\tend\n \t\t\t\t\t\t3'b010: begin // C.LW\n \t\t\t\t\t\t\tmem_rdata_q[31:20] <= {mem_rdata_latched[5], mem_rdata_latched[12:10], mem_rdata_latched[6], 2'b00};\n@@ -565,7 +565,7 @@ module picorv32 #(\n \t\t\t\t\t\t\t3'b000: begin // C.ADDI4SPN\n \t\t\t\t\t\t\t\tis_alu_reg_imm <= |mem_rdata_latched[12:5];\n \t\t\t\t\t\t\t\tdecoded_rs1 <= 2;\n-\t\t\t\t\t\t\t\tdecoded_rd <= 8 + mem_rdata_latched[9:7];\n+\t\t\t\t\t\t\t\tdecoded_rd <= 8 + mem_rdata_latched[4:2];\n \t\t\t\t\t\t\tend\n \t\t\t\t\t\t\t3'b010: begin // C.LW\n \t\t\t\t\t\t\t\tis_lb_lh_lw_lbu_lhu <= 1;",
+  "rtl_diff_lines": 4,
+  "source": "historical"
+}

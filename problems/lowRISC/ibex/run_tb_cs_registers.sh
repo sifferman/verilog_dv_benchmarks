@@ -23,6 +23,10 @@ if [ ! -d "$VENDOR_DIR" ] || [ -z "$(ls -A "$VENDOR_DIR" 2>/dev/null)" ]; then
   bash "$SCRIPT_DIR/populate_vendor.sh"
 fi
 
+# Wipe the Verilator build cache. Reusing it between runs leaves stale paths
+# (e.g. the previous clones/lowRISC__ibex/ layout) baked into Vtb_*.mk, which
+# then makes `make` fail to find sources at the new clones/lowRISC/ibex/ path.
+rm -rf "$MDIR"
 mkdir -p "$MDIR"
 
 # Patch tb_cs_registers.sv: remove `ifndef VERILATOR guard, fix exit code.

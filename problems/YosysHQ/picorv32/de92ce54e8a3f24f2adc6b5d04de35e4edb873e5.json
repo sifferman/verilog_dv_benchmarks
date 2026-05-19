@@ -1,0 +1,22 @@
+{
+  "problem_id": "YosysHQ/picorv32/de92ce54e8a3f24f2adc6b5d04de35e4edb873e5",
+  "repo_url": "https://github.com/YosysHQ/picorv32",
+  "owner": "YosysHQ",
+  "repo_name": "picorv32",
+  "fix_commit": "de92ce54e8a3f24f2adc6b5d04de35e4edb873e5",
+  "buggy_rtl_commit": "b91af1c87e8bc4ae5b0b438c4ac04400a12b76fb",
+  "fix_commit_msg": "Fix RV32E shifts",
+  "description": "Fix RV32E shifts",
+  "date_created": "2026-05-19",
+  "rtl_dir": "picorv32.v",
+  "dv_dir": "testbench.v",
+  "rtl_files_changed": [
+    "picorv32.v"
+  ],
+  "test_commands": [
+    "bash problems/YosysHQ/picorv32/run_de92ce54.sh"
+  ],
+  "rtl_diff": "diff --git a/picorv32.v b/picorv32.v\nindex f13cea9..cc45fa9 100644\n--- a/picorv32.v\n+++ b/picorv32.v\n@@ -652,7 +652,8 @@ module picorv32 #(\n \treg instr_getq, instr_setq, instr_retirq, instr_maskirq, instr_waitirq, instr_timer;\n \twire instr_trap;\n \n-\treg [regindex_bits-1:0] decoded_rd, decoded_rs1, decoded_rs2;\n+\treg [regindex_bits-1:0] decoded_rd, decoded_rs1;\n+\treg [4:0] decoded_rs2;\n \treg [31:0] decoded_imm, decoded_imm_j;\n \treg decoder_trigger;\n \treg decoder_trigger_q;",
+  "rtl_diff_lines": 3,
+  "source": "historical"
+}
