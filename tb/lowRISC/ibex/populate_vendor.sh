@@ -12,7 +12,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)/clones/lowRISC__ibex"
+REPO_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)/clones/lowRISC/ibex"
 DEST="$SCRIPT_DIR/vendor"
 
 if [ ! -d "$REPO_DIR/.git" ]; then

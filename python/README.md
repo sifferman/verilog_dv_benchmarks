@@ -16,12 +16,12 @@ See `requirements.txt` for dependencies. For implementation internals, see `TRAC
 python python/mine_repo.py check-url https://github.com/lowRISC/ibex
 
 # 2. Walk commit history for candidate (prev → fix) pairs
-python python/mine_repo.py list-candidates clones/lowRISC__ibex \
+python python/mine_repo.py list-candidates clones/lowRISC/ibex \
     --repo-url https://github.com/lowRISC/ibex \
     --rtl-dir rtl/ --dv-dir dv/cs_registers
 
 # 3. Verify one candidate: test passes at fix, fails at prev
-python python/mine_repo.py try-commit clones/lowRISC__ibex \
+python python/mine_repo.py try-commit clones/lowRISC/ibex \
     --repo-url https://github.com/lowRISC/ibex \
     --fix-commit <sha> --prev-commit <prev_sha> \
     --rtl-dir rtl/ --dv-dir dv/cs_registers \
@@ -55,7 +55,7 @@ Per problem, the harness writes `logs/{problem_id}/result.json` plus the raw tes
 | `logs/{problem_id}/result.json` | `verify_problem` | Verification verdict + exit codes |
 | `logs/{problem_id}/solution.log` | `verify_problem` | Test output at fix commit |
 | `logs/{problem_id}/buggy.log` | `verify_problem` | Test output with RTL reverted to prev |
-| `clones/{owner}__{repo}/` | first git clone | Local mirror (gitignored) |
+| `clones/{owner}/{repo}/` | first git clone | Local mirror (gitignored) |
 
 ## CLI reference
 

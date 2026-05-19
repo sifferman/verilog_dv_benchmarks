@@ -52,7 +52,7 @@ class Problem:
 
     @property
     def repo_clone_directory(self) -> Path:
-        return CLONES_DIRECTORY / f"{self.owner}__{self.repo_name}"
+        return CLONES_DIRECTORY / self.owner / self.repo_name
 
     @property
     def problem_log_directory(self) -> Path:

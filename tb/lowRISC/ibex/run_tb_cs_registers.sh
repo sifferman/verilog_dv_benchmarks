@@ -12,7 +12,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/lowRISC__ibex" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/lowRISC/ibex" && pwd)"
 VENDOR_DIR="$SCRIPT_DIR/vendor"
 DV_DIR="$REPO_DIR/dv/cs_registers"
 IBEX_RTL="$REPO_DIR/rtl"

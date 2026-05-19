@@ -8,7 +8,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/lowRISC__opentitan" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/lowRISC/opentitan" && pwd)"
 PRIM_RTL="$REPO_DIR/hw/ip/prim/rtl"
 
 TOP="${TOP_MODULE:-tb_prim_fifo_sync_depth0}"

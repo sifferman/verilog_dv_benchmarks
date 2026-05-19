@@ -84,7 +84,7 @@ def _debug_me_brief(problem: Problem) -> str:
         f"\n"
         f"## Run the test (it currently fails)\n"
         f"\n"
-        f"Test commands are project-rooted — they read RTL from `clones/{problem.owner}__{problem.repo_name}/`,\n"
+        f"Test commands are project-rooted — they read RTL from `clones/{problem.owner}/{problem.repo_name}/`,\n"
         f"not from this sandbox copy. To actually run them, put that in-place clone\n"
         f"into the same buggy state via `python python/verify_problem.py --mode buggy`,\n"
         f"or edit there directly. The forthcoming Docker eval flow will remove this\n"

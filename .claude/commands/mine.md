@@ -35,7 +35,7 @@ For each viable repo, working through them one at a time:
 Clone into the project-local `clones/` directory (tracked in `.gitignore`):
 
 ```bash
-git clone --filter=blob:none "<repo_url>" clones/<owner>__<repo_name>
+git clone --filter=blob:none "<repo_url>" clones/<owner>/<repo_name>
 ```
 
 `--filter=blob:none` gives full commit history with on-demand blob fetching.
@@ -116,7 +116,7 @@ If even patching is too invasive and no DV exists, write a **minimal custom
 Verilator testbench** and a runner script in `tb/<owner>/<repo>/`. The runner
 script must:
 - Resolve its own location with `SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"`
-- Derive the repo path as `REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/<owner>__<repo>" && pwd)"`
+- Derive the repo path as `REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/<owner>/<repo>" && pwd)"`
 - Resolve any input `TB_FILE` path to absolute **before** any `cd` that changes CWD
 
 ```bash
@@ -160,7 +160,7 @@ python python/mine_repo.py update-log \
 ## Phase 3 — Mine commits
 
 ```bash
-python python/mine_repo.py list-candidates clones/<owner>__<repo_name> \
+python python/mine_repo.py list-candidates clones/<owner>/<repo_name> \
   --repo-url "<repo_url>" \
   --rtl-dir  "<rtl_dir>" \
   --dv-dir   "<dv_dir>"
@@ -187,7 +187,7 @@ To inspect a candidate's full diff without checking out, `cd` into the clone
 first (so `git show`/`git log` operate on that repo, not some arbitrary path).
 **Never use `git -C <path>` — always `cd` first:**
 ```bash
-cd clones/<owner>__<repo_name>
+cd clones/<owner>/<repo_name>
 git log --oneline -- <rtl_files>
 git show <fix_commit> -- <rtl_files>
 cd -
@@ -212,7 +212,7 @@ For each candidate record from Phase 3:
 ### 4a. Try the commit pair
 
 ```bash
-python python/mine_repo.py try-commit clones/<owner>__<repo_name> \
+python python/mine_repo.py try-commit clones/<owner>/<repo_name> \
   --repo-url    "<repo_url>" \
   --fix-commit  "<fix_commit>" \
   --prev-commit "<prev_commit>" \
