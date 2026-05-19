@@ -9,12 +9,15 @@
 # --- helpers ------------------------------------------------------------------
 
 # Echo the first executable found in the candidate list. Empty if none match.
+# Always returns 0 — callers may run under `set -e`, and a missing tool here
+# is expected (we want an empty DVBENCH_* var, not an aborted source).
 _dvbench_find_tool() {
     local candidate
     for candidate in "$@"; do
         if [ -x "$candidate" ]; then echo "$candidate"; return 0; fi
     done
-    command -v "$(basename "$1")" 2>/dev/null
+    command -v "$(basename "$1")" 2>/dev/null || true
+    return 0
 }
 
 # Add the directory containing $1 to PATH if it isn't already there.
