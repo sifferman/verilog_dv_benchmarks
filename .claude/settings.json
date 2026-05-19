@@ -1,9 +1,22 @@
 {
   "permissions": {
     "allow": [
+      "Bash(python3 python/mine_repo.py *)",
+      "Bash(python3 python/verify_problem.py *)",
+      "Bash(python3 python/prepare_sandbox.py *)",
+      "Bash(git clone --filter=blob:none *)",
       "Bash(git show *)",
       "Bash(git log *)",
-      "Bash(python3 scripts/mine_repo.py *)"
+      "Bash(git branch *)",
+      "Bash(git diff *)",
+      "Bash(git status)",
+      "Bash(verilator *)",
+      "Bash(bash tb/* *)",
+      "Bash(find clones/* *)",
+      "Bash(find tb/* *)",
+      "Bash(make *)",
+      "Bash(fusesoc *)",
+      "Bash(timeout *)"
     ]
   }
 }

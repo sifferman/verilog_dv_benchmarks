@@ -1,1 +1,5 @@
 clones/
+logs/
+sandboxes/
+tb/**/vendor/
+__pycache__

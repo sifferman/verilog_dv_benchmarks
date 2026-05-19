@@ -15,7 +15,7 @@ Parse `$ARGUMENTS` (or `./repos` if empty) into a list of GitHub URLs.
 For each URL, run:
 
 ```bash
-python scripts/mine_repo.py check-url "<url>"
+python python/mine_repo.py check-url "<url>"
 ```
 
 This emits JSONL to stdout — one record per discovered repository.
@@ -60,7 +60,7 @@ If the DV lives in a separate repo, record `"reason_skipped": "DV in separate
 repo"` and skip with:
 
 ```bash
-python scripts/mine_repo.py update-log --repo-url "<url>" --reason "DV in separate repo"
+python python/mine_repo.py update-log --repo-url "<url>" --reason "DV in separate repo"
 ```
 
 ### 2c. Identify the build / simulation system
@@ -79,27 +79,57 @@ Common examples (paths relative to project root):
 make sim                                      # Makefile target in clone
 fusesoc run --target=sim <core>               # FuseSoC
 python -m pytest dv/                          # cocotb / pytest
-bash clones/<owner>__<repo>__tb/run_tests.sh  # custom runner script
+bash tb/<owner>/<repo>/run_tests.sh           # custom runner script
 ```
 
-If the existing DV is too complex to run (requires licensed simulators, special
-hardware, large external deps), write a **minimal custom Verilator testbench**
-and a runner script in `clones/<owner>__<repo>__tb/`. The runner script must:
+**STRONGLY PREFER using the repo's own DV.** Even if the full test suite can't
+run, look hard for a subset that can:
+- A standalone directed test or unit test that exercises the changed RTL
+- A Verilator-compatible testbench (look for `ifndef VERILATOR` guards — these
+  often just need `--timing` and a minor patch to the clock generator)
+- A C++/DPI-based testbench that compiles with `verilator --binary --timing`
+  plus the DPI source files from the same commit
+- A formal property that can be reframed as a simulation assertion
+
+**Only write a custom testbench as a last resort** when no official DV exists
+for the changed module at all. Custom (AI-generated) testbenches are fragile,
+may test the wrong thing, and undermine benchmark credibility. If you must
+write one, document clearly why no official DV was usable.
+
+**Verilator version note** — Many older repos were written for VCS/Questa and
+may have guards like `` `ifndef VERILATOR `` or assume simulation semantics not
+available in older Verilator. Modern Verilator (5.x) is highly compatible with
+VCS when you use `--binary`, which generates its own `main()` and **implies
+`--timing`** (so never write `--binary --timing` — `--binary` alone is
+sufficient and correct).
+
+**Patching official DV for Verilator** — minimal patches are acceptable:
+- Remove `` `ifndef VERILATOR `` guard around clock/reset generators (`--binary`
+  handles timing natively)
+- Change `$finish()` to `$fatal(1)` on test failure for correct exit codes
+- Add missing `inout` port drivers for ports the C++ top used to drive
+Store the patch inline in the runner script (via `python3 -c` or `sed`) so the
+official source file is never modified in-place. Both the DV C++ model and the
+RTL must come from the **same checked-out commit** so they stay consistent.
+
+If even patching is too invasive and no DV exists, write a **minimal custom
+Verilator testbench** and a runner script in `tb/<owner>/<repo>/`. The runner
+script must:
 - Resolve its own location with `SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"`
-- Derive the repo path as `REPO_DIR="$(cd "$SCRIPT_DIR/../<owner>__<repo>" && pwd)"`
+- Derive the repo path as `REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/<owner>__<repo>" && pwd)"`
 - Resolve any input `TB_FILE` path to absolute **before** any `cd` that changes CWD
 
 ```bash
 # Example compile-and-run inside the runner script:
-verilator --binary --timing --top-module tb_<name> \
+verilator --binary --top-module tb_<fix_commit_8> \
   --Mdir /tmp/vbuild_<name> --Wno-fatal \
   <pkg.sv first, then RTL, then tb.sv>
-timeout 30 /tmp/vbuild_<name>/Vtb_<name>
+timeout 30 /tmp/vbuild_<name>/Vtb_<fix_commit_8>
 ```
 
 **IMPORTANT: The `--Mdir` build cache may use `/tmp`. Testbench source files
-(`.sv`, `.sh`) MUST live permanently in `clones/<owner>__<repo>__tb/` — never
-in `/tmp`. Test/setup commands in JSON files must use relative paths only.**
+(`.sv`, `.sh`) MUST live permanently in `tb/<owner>/<repo>/` — never in
+`/tmp`. Test/setup commands in JSON files must use relative paths only.**
 
 ### 2d. Verify the test runner at HEAD
 
@@ -111,14 +141,14 @@ If it fails:
 - Up to 3 attempts. If it still doesn't pass, skip this repo:
 
 ```bash
-python scripts/mine_repo.py update-log \
+python python/mine_repo.py update-log \
   --repo-url "<url>" --reason "cannot run build"
 ```
 
 If it passes, record the confirmed setup:
 
 ```bash
-python scripts/mine_repo.py update-log \
+python python/mine_repo.py update-log \
   --repo-url "<url>" \
   --rtl-dir  "<rtl_dir>" \
   --dv-dir   "<dv_dir>" \
@@ -130,7 +160,7 @@ python scripts/mine_repo.py update-log \
 ## Phase 3 — Mine commits
 
 ```bash
-python scripts/mine_repo.py list-candidates clones/<owner>__<repo_name> \
+python python/mine_repo.py list-candidates clones/<owner>__<repo_name> \
   --repo-url "<repo_url>" \
   --rtl-dir  "<rtl_dir>" \
   --dv-dir   "<dv_dir>"
@@ -163,10 +193,10 @@ git show <fix_commit> -- <rtl_files>
 cd -
 ```
 
-**Keep `data/log.csv` up to date as you walk commits.** After each batch of
+**Keep `problems/log.csv` up to date as you walk commits.** After each batch of
 candidates triaged (even if none were saved), update `commits_walked`:
 ```bash
-python3 scripts/mine_repo.py update-log \
+python3 python/mine_repo.py update-log \
   --repo-url "<repo_url>" \
   --add-commits-walked <N>
 ```
@@ -182,22 +212,25 @@ For each candidate record from Phase 3:
 ### 4a. Try the commit pair
 
 ```bash
-python scripts/mine_repo.py try-commit clones/<owner>__<repo_name> \
+python python/mine_repo.py try-commit clones/<owner>__<repo_name> \
   --repo-url    "<repo_url>" \
   --fix-commit  "<fix_commit>" \
   --prev-commit "<prev_commit>" \
   --rtl-dir     "<rtl_dir>" \
   --dv-dir      "<dv_dir>" \
-  --rtl-files   <rtl_files...> \
-  --test-cmd    "<test_cmd>"
+  --test-cmd    "<test_cmd>" \
+  <rtl_files...>
 ```
+
+`<rtl_files...>` is a space-separated list of RTL paths, given as trailing
+positional arguments.
 
 The script:
 1. Checks out `fix_commit` cleanly and runs the test (must pass).
 2. Reverts `rtl_files` to `prev_commit` and runs the test again (must fail).
-3. On success, saves `data/<owner>/<repo_name>/<fix_commit>.json`.
+3. On success, saves `problems/<owner>/<repo_name>/<fix_commit>.json`.
 
-The result JSON has `"outcome"` ∈ `{success, skip, error}`. Log skips/errors
+The result JSON has `"outcome"` in `{success, skip, error}`. Log skips/errors
 and move on.
 
 ### 4b. Handle compile/elaboration failures (agent-assisted)
@@ -219,25 +252,31 @@ added by the fix. Make **only minimal** structural changes to allow compilation:
 
 After each minimal fix, re-run the test. If compilation succeeds and the test
 now fails at **runtime** (the assertion or simulation failure we want), proceed
-to save the instance by running `try-commit` again.
+to save the problem by running `try-commit` again.
 
 If compile errors cannot be resolved with minimal changes in ≤ 3 attempts,
 skip the candidate.
 
 ### 4c. Per-candidate testbenches
 
-When the standard test command doesn't work for a specific commit pair
-(e.g., the general TB tests a feature not yet present at `prev_commit`),
-write a **focused testbench** that tests only the behavior introduced by
-`fix_commit`. Pass it via the `--test-cmd` override rather than modifying the
-shared testbench.
+**Strongly prefer official DV** (see Phase 2c). Only fall back to a custom
+testbench when no official DV exists for the changed module.
 
-Store per-candidate testbenches alongside the shared assets (outside the clone):
+When a custom testbench is necessary, write a **focused testbench** that tests
+only the behavior introduced by `fix_commit`. Pass it via the `--test-cmd`
+override rather than modifying the shared testbench.
+
+**Naming rule**: custom testbench files must be named after the fix commit
+(first 8 chars) — `tb_<fix_commit_8>.sv` — not after the module. This makes
+the association between testbench and problem unambiguous.
+
+Store per-candidate testbenches in the tracked `tb/` directory (never inside
+`clones/` which is gitignored):
 ```
-clones/<owner>__<repo_name>__tb/
-  run_tests.sh          # shared runner, reads TB_FILE env var
-  tb_shared.sv          # general multi-test TB
-  tb_<fix_commit_8>.sv  # focused single-candidate TB
+tb/<owner>/<repo_name>/
+  run_tests.sh           # shared runner, reads TB_FILE env var
+  run_tb_official.sh     # official DV runner (preferred)
+  tb_<fix_commit_8>.sv   # focused single-candidate TB (last resort)
 ```
 
 ---
@@ -253,8 +292,8 @@ When called without arguments, process every non-blank, non-comment line in
 
 After processing, print a summary:
 - Repos checked / viable / skipped
-- Candidates found / instances saved
-- Point the user to `data/log.csv` for the full tracking table
+- Candidates found / problems saved
+- Point the user to `problems/log.csv` for the full tracking table
 
 ---
 
@@ -278,19 +317,18 @@ Rules for new permission patterns:
 
 ---
 
-## Saved instance JSON schema
+## Saved problem JSON schema
 
-Each saved `data/<owner>/<repo>/<fix_commit>.json` contains:
+Each saved `problems/<owner>/<repo>/<fix_commit>.json` contains:
 
 | Field | Description |
 |-------|-------------|
-| `instance_id` | `<owner>__<repo>__<fix_commit>` |
+| `problem_id` | `<owner>/<repo>/<fix_commit>` |
 | `fix_commit` | SHA of the commit that fixed the bug |
 | `buggy_rtl_commit` | SHA of the parent (buggy state) |
 | `fix_commit_msg` | Full commit message (title + body) |
-| `problem_statement` | Same as `fix_commit_msg` — describes the bug to the LLM |
+| `description` | Same as `fix_commit_msg` — describes the bug to the LLM |
 | `rtl_files_changed` | Files reverted to create the buggy state |
-| `test_commands` | Command(s) to verify: exits 0 = fixed, non-0 = buggy |
-| `setup_commands` | Steps to reproduce the buggy state from scratch |
+| `test_commands` | Command(s) to verify: exits 0 = solution passes, non-0 = buggy. Run from project root. |
 | `rtl_diff` | The ground-truth fix diff |
 | `rtl_diff_lines` | Added + removed lines (signal for task difficulty) |

@@ -1,5 +1,4 @@
 {
-  "instance_id": "lowRISC__ibex__357b40828f2a607d4fd9ca9e9b32343f5c4424f0",
   "repo_url": "https://github.com/lowRISC/ibex",
   "owner": "lowRISC",
   "repo_name": "ibex",
@@ -13,16 +12,10 @@
     "rtl/ibex_pkg.sv"
   ],
   "test_commands": [
-    "TOP_MODULE=tb_csr_mseccfgh TB_FILE=clones/lowRISC__ibex__tb/tb_csr_mseccfgh.sv bash clones/lowRISC__ibex__tb/run_tests.sh"
-  ],
-  "setup_commands": [
-    "git clone https://github.com/lowRISC/ibex repo",
-    "cd repo",
-    "git checkout 357b40828f2a607d4fd9ca9e9b32343f5c4424f0",
-    "git checkout d78e0d9a068b4b37b79d205a1f3de1fea907e07d -- rtl/ibex_cs_registers.sv",
-    "git checkout d78e0d9a068b4b37b79d205a1f3de1fea907e07d -- rtl/ibex_pkg.sv"
+    "TOP_MODULE=tb_csr_mseccfgh TB_FILE=tb/lowRISC/ibex/tb_357b4082.sv bash tb/lowRISC/ibex/run_tests.sh"
   ],
   "rtl_diff": "diff --git a/rtl/ibex_cs_registers.sv b/rtl/ibex_cs_registers.sv\nindex 162f2712..b4232687 100644\n--- a/rtl/ibex_cs_registers.sv\n+++ b/rtl/ibex_cs_registers.sv\n@@ -349,10 +349,22 @@ module ibex_cs_registers #(\n       end\n \n       CSR_MSECCFG: begin\n-        csr_rdata_int                       = '0;\n-        csr_rdata_int[CSR_MSECCFG_MML_BIT]  = pmp_mseccfg.mml;\n-        csr_rdata_int[CSR_MSECCFG_MMWP_BIT] = pmp_mseccfg.mmwp;\n-        csr_rdata_int[CSR_MSECCFG_RLB_BIT]  = pmp_mseccfg.rlb;\n+        if (PMPEnable) begin\n+          csr_rdata_int                       = '0;\n+          csr_rdata_int[CSR_MSECCFG_MML_BIT]  = pmp_mseccfg.mml;\n+          csr_rdata_int[CSR_MSECCFG_MMWP_BIT] = pmp_mseccfg.mmwp;\n+          csr_rdata_int[CSR_MSECCFG_RLB_BIT]  = pmp_mseccfg.rlb;\n+        end else begin\n+          illegal_csr = 1'b1;\n+        end\n+      end\n+\n+      CSR_MSECCFGH: begin\n+        if (PMPEnable) begin\n+          csr_rdata_int = '0;\n+        end else begin\n+          illegal_csr = 1'b1;\n+        end\n       end\n \n       // PMP registers\ndiff --git a/rtl/ibex_pkg.sv b/rtl/ibex_pkg.sv\nindex b982c50c..dcff9dfd 100644\n--- a/rtl/ibex_pkg.sv\n+++ b/rtl/ibex_pkg.sv\n@@ -368,6 +368,7 @@ typedef enum logic[11:0] {\n   CSR_MIP       = 12'h344,\n \n   CSR_MSECCFG   = 12'h390,\n+  CSR_MSECCFGH  = 12'h391,\n \n   // Physical memory protection\n   CSR_PMPCFG0   = 12'h3A0,",
   "rtl_diff_lines": 21,
-  "source": "historical"
+  "source": "historical",
+  "problem_id": "lowRISC/ibex/357b40828f2a607d4fd9ca9e9b32343f5c4424f0"
 }
