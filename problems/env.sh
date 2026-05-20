@@ -97,6 +97,34 @@ dvbench_cocotb_pytest() {
 # default to the safe (oss-cad-suite-only) behavior.
 unset PYTHONPATH
 
+# --- clones / submodules ------------------------------------------------------
+#
+# Some testbenches reference RTL that lives in a git submodule of the cloned
+# upstream repo (e.g. cva6's corev_apu/riscv-dbg), or in a separate upstream
+# repo the verifier didn't clone itself (e.g. pulp-platform/tech_cells_generic
+# from hwpe-ctrl / riscv-dbg testbenches). The verifier's GitRepo.clone_if_missing
+# only does a shallow blob-filtered clone of the per-problem repo, so the run
+# scripts have to pull in these extra trees themselves.
+
+# Initialize a specific submodule of an already-cloned repo. No-op if the
+# submodule is already populated.
+dvbench_init_submodule() {
+    local clone_dir="$1" submodule_path="$2"
+    if [ ! -e "$clone_dir/$submodule_path/.git" ]; then
+        git -C "$clone_dir" submodule update --init "$submodule_path" >/dev/null
+    fi
+}
+
+# Clone a sibling upstream repo into clones/<owner>/<repo> if missing.
+dvbench_ensure_sibling_clone() {
+    local clones_root="$1" owner="$2" repo="$3"
+    local target="$clones_root/$owner/$repo"
+    if [ ! -d "$target/.git" ]; then
+        mkdir -p "$clones_root/$owner"
+        git clone --filter=blob:none "https://github.com/$owner/$repo" "$target" >/dev/null
+    fi
+}
+
 # --- FuseSoC config -----------------------------------------------------------
 
 # Path to the project-local fusesoc.conf (sets build_root, cache_root, library).

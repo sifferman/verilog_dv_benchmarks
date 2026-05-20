@@ -8,6 +8,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/openhwgroup/cva6" && pwd)"
 . "$SCRIPT_DIR/../../env.sh"
 
+# The TB needs dm_pkg.sv from cva6's riscv-dbg submodule.
+dvbench_init_submodule "$REPO_DIR" corev_apu/riscv-dbg
+
 BUILD_DIR=/tmp/vbuild_cva6_8146c96d
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"

@@ -5,8 +5,13 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/../../../clones/pulp-platform/riscv-dbg" && pwd)"
-TECH_DIR="$(cd "$SCRIPT_DIR/../../../clones/pulp-platform/tech_cells_generic" && pwd)"
+CLONES_ROOT="$(cd "$SCRIPT_DIR/../../../clones" && pwd)"
 . "$SCRIPT_DIR/../../env.sh"
+
+# The TB needs tc_clk.sv from pulp-platform/tech_cells_generic, which the
+# verifier didn't clone (it only clones the per-problem repo).
+dvbench_ensure_sibling_clone "$CLONES_ROOT" pulp-platform tech_cells_generic
+TECH_DIR="$CLONES_ROOT/pulp-platform/tech_cells_generic"
 
 BUILD_DIR=/tmp/vbuild_riscv_dbg_d7b86704
 rm -rf "$BUILD_DIR"

@@ -19,7 +19,7 @@ mkdir -p "$BUILD_DIR"
 
 # 1) Assemble the focused probe into a raw binary loaded at 0x80000000.
 "$DVBENCH_RISCV32_GCC" -x assembler-with-cpp -nostdlib -nostartfiles \
-    -march=rv32i -mabi=ilp32 \
+    -march=rv32i_zicsr -mabi=ilp32 \
     -Wl,-Ttext=0x80000000 \
     "$SCRIPT_DIR/probe_6af9c4be.S" \
     -o "$BUILD_DIR/probe.elf"

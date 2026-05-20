@@ -20,7 +20,8 @@ jobs:
 
       - name: Install system + Python dependencies
         run: |
-          sudo apt-get install python3-dev
+          # libbit-vector-perl: required by chipsalliance/Cores-VeeR-EL2 configs/veer.config.
+          sudo apt-get install -y python3-dev libbit-vector-perl
           pip3 install -r requirements.txt
           # FuseSoC (.core-driven builds, used by olofk/serv, pulp-platform, ...)
           pip3 install fusesoc
@@ -32,6 +33,14 @@ jobs:
           wget -O - https://raw.githubusercontent.com/sifferman/hdl-tool-installer/main/install | bash -s -- . --oss-cad-suite --zachjs-sv2v
           echo "$GITHUB_WORKSPACE/oss-cad-suite/bin" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/zachjs-sv2v" >> $GITHUB_PATH
+          # Make-based cocotb testbenches (e.g. alexforencich/verilog-axi) load
+          # vvp from oss-cad-suite, which links the bundled Python 3.11 — not
+          # the system Python. The bundled cocotb 2.x discovers tests by
+          # importing test modules that do `import cocotb_test.simulator` at
+          # module scope (used for their pytest entry points). Install the
+          # shim packages into oss-cad-suite's Python so the import succeeds.
+          "$GITHUB_WORKSPACE/oss-cad-suite/bin/python3" -m pip install --no-deps \
+            cocotb-test cocotbext-axi cocotbext-eth cocotbext-pcie cocotbext-uart cocotbext-i2c
 
       - name: Install riscv32-unknown-elf toolchain
         run: |
