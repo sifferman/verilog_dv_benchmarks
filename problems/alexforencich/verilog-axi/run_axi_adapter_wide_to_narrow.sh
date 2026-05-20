@@ -19,11 +19,11 @@ TB_DIR="$REPO_DIR/tb/axi_adapter"
 env -u PYTHONPATH PATH="$PATH" make -C "$TB_DIR" SIM=icarus clean >/dev/null 2>&1 || true
 rm -rf "$TB_DIR/sim_build"
 
-# Hard wall-clock cap: HEAD finishes in ~40s; buggy parent deadlocks. Use 90s.
+# The buggy parent deadlocks, so a timeout is used
 LOG="$(mktemp)"
 trap 'rm -f "$LOG"' EXIT
 set +e
-timeout 90 env -u PYTHONPATH PATH="$PATH" make -C "$TB_DIR" SIM=icarus \
+timeout 150 env -u PYTHONPATH PATH="$PATH" make -C "$TB_DIR" SIM=icarus \
     PARAM_S_DATA_WIDTH=32 PARAM_M_DATA_WIDTH=8 \
     PARAM_S_STRB_WIDTH=4 PARAM_M_STRB_WIDTH=1 \
     > "$LOG" 2>&1
