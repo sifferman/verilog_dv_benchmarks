@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cv32e40s/fca9a6b0a81fe27cfa0d83ed76292b518eb696ba",
+  "repo_url": "https://github.com/openhwgroup/cv32e40s",
+  "owner": "openhwgroup",
+  "repo_name": "cv32e40s",
+  "fix_commit": "fca9a6b0a81fe27cfa0d83ed76292b518eb696ba",
+  "buggy_rtl_commit": "bec34fe6bec456943f30d8a4f47519c1343827a2",
+  "fix_commit_msg": "cm.lbu used wrong encoding in checking legal immediate values.\n\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "description": "cm.lbu used wrong encoding in checking legal immediate values.\n\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "tb",
+  "rtl_files_changed": [
+    "rtl/cv32e40x_compressed_decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cv32e40s/run_tb_fca9a6b0.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/cv32e40x_compressed_decoder.sv b/rtl/cv32e40x_compressed_decoder.sv\nindex 6cc0f564..e123d123 100644\n--- a/rtl/cv32e40x_compressed_decoder.sv\n+++ b/rtl/cv32e40x_compressed_decoder.sv\n@@ -364,7 +364,7 @@ module cv32e40x_compressed_decoder import cv32e40x_pkg::*;\n                   // cm.lbu rd', uimm(rs1') -> lbu rd', uimm(rs1')\n                   instr_o.bus_resp.rdata = {8'h00, instr[10], instr[6:5], instr[11], 2'b01, instr[9:7], 3'b100, 2'b01, instr[4:2], OPCODE_LOAD};\n \n-                  if ({instr[11:10], instr[6]} == 3'b000) begin\n+                  if ({instr[10], instr[6]} == 2'b00) begin\n                     illegal_instr_o = 1'b1;\n                   end\n                 end",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

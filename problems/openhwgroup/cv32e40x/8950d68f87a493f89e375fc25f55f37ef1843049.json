@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cv32e40x/8950d68f87a493f89e375fc25f55f37ef1843049",
+  "repo_url": "https://github.com/openhwgroup/cv32e40x",
+  "owner": "openhwgroup",
+  "repo_name": "cv32e40x",
+  "fix_commit": "8950d68f87a493f89e375fc25f55f37ef1843049",
+  "buggy_rtl_commit": "50ac72c",
+  "fix_commit_msg": "Added check for illegal instruction if bits [24:20] is not zero.\n\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "description": "Added check for illegal instruction if bits [24:20] is not zero.\n\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "bhv",
+  "rtl_files_changed": [
+    "rtl/cv32e40x_b_decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cv32e40x/run_tb_8950d68f.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/cv32e40x_b_decoder.sv b/rtl/cv32e40x_b_decoder.sv\nindex fdac8c9..18bd47c 100644\n--- a/rtl/cv32e40x_b_decoder.sv\n+++ b/rtl/cv32e40x_b_decoder.sv\n@@ -144,6 +144,9 @@ module cv32e40x_b_decoder import cv32e40x_pkg::*;\n               decoder_ctrl_o.illegal_insn               = 1'b0;\n               decoder_ctrl_o.rf_re[1]                   = 1'b0; // rs2 is not read, but field is hardcoded to x0\n               decoder_ctrl_o.alu_operator               = ALU_B_ZEXT_H;\n+              if (instr_rdata_i[24:20] != 5'b00000) begin\n+                decoder_ctrl_o = DECODER_CTRL_ILLEGAL_INSN;\n+              end\n             end\n           end",
+  "rtl_diff_lines": 3,
+  "source": "historical"
+}

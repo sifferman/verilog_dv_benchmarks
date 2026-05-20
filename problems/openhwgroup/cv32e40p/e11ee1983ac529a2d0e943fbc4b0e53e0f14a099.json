@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cv32e40p/e11ee1983ac529a2d0e943fbc4b0e53e0f14a099",
+  "repo_url": "https://github.com/openhwgroup/cv32e40p",
+  "owner": "openhwgroup",
+  "repo_name": "cv32e40p",
+  "fix_commit": "e11ee1983ac529a2d0e943fbc4b0e53e0f14a099",
+  "buggy_rtl_commit": "0133aa4eea1dec7c437ef37110d7e466d8531748",
+  "fix_commit_msg": "Added illegal instruction exception decoding on unused Imm6 bits for some SIMD instructions.\n\nSigned-off-by: Pascal Gouedo <pascal.gouedo@dolphin.fr>",
+  "description": "Added illegal instruction exception decoding on unused Imm6 bits for some SIMD instructions.\n\nSigned-off-by: Pascal Gouedo <pascal.gouedo@dolphin.fr>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "example_tb",
+  "rtl_files_changed": [
+    "rtl/cv32e40p_decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cv32e40p/run_tb_e11ee198.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/cv32e40p_decoder.sv b/rtl/cv32e40p_decoder.sv\nindex b98400b..bda7325 100644\n--- a/rtl/cv32e40p_decoder.sv\n+++ b/rtl/cv32e40p_decoder.sv\n@@ -2257,6 +2257,11 @@ module cv32e40p_decoder\n                   instr_rdata_i[25] != 1'b0) begin\n                 illegal_insn_o = 1'b1;\n               end\n+              // Imm6 restrictions\n+              if ((instr_rdata_i[14:12] == 3'b110 && instr_rdata_i[24:23] != 2'b0) ||\n+                  (instr_rdata_i[14:12] == 3'b111 && instr_rdata_i[24:22] != 3'b0)) begin\n+                illegal_insn_o = 1'b1;\n+              end\n             end\n             6'b01001_0: begin // cv.sra\n               alu_operator_o = ALU_SRA;\n@@ -2268,6 +2273,11 @@ module cv32e40p_decoder\n                   instr_rdata_i[25] != 1'b0) begin\n                 illegal_insn_o = 1'b1;\n               end\n+              // Imm6 restrictions\n+              if ((instr_rdata_i[14:12] == 3'b110 && instr_rdata_i[24:23] != 2'b0) ||\n+                  (instr_rdata_i[14:12] == 3'b111 && instr_rdata_i[24:22] != 3'b0)) begin\n+                illegal_insn_o = 1'b1;\n+              end\n             end\n             6'b01010_0: begin // cv.sll\n               alu_operator_o = ALU_SLL;\n@@ -2279,6 +2289,11 @@ module cv32e40p_decoder\n                   instr_rdata_i[25] != 1'b0) begin\n                 illegal_insn_o = 1'b1;\n               end\n+              // Imm6 restrictions\n+              if ((instr_rdata_i[14:12] == 3'b110 && instr_rdata_i[24:23] != 2'b0) ||\n+                  (instr_rdata_i[14:12] == 3'b111 && instr_rdata_i[24:22] != 3'b0)) begin\n+                illegal_insn_o = 1'b1;\n+              end\n             end\n             6'b01011_0: begin // cv.or\n               alu_operator_o = ALU_OR;\n@@ -2415,6 +2430,11 @@ module cv32e40p_decoder\n                 end\n                 default: illegal_insn_o = 1'b1;\n               endcase\n+              // Imm6 restrictions\n+              if ((instr_rdata_i[12] == 1'b0 && instr_rdata_i[24:20] != 5'b0) ||\n+                  (instr_rdata_i[12] == 1'b1 && instr_rdata_i[24:21] != 4'b0)) begin\n+                illegal_insn_o = 1'b1;\n+              end\n             end\n             6'b11000_0: begin // cv.shuffle, cv.shuffleI0\n               alu_operator_o       = ALU_SHUF;\n@@ -2429,6 +2449,10 @@ module cv32e40p_decoder\n                   instr_rdata_i[25] != 1'b0) begin\n                 illegal_insn_o = 1'b1;\n               end\n+              // Imm6 restriction\n+              if (instr_rdata_i[14:12] == 3'b110 && instr_rdata_i[24:21] != 4'b0) begin\n+                illegal_insn_o = 1'b1;\n+              end\n             end\n             6'b11001_0,\n             6'b11010_0,",
+  "rtl_diff_lines": 24,
+  "source": "historical"
+}

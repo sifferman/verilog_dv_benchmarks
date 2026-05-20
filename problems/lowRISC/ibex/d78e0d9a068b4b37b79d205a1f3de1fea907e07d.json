@@ -1,0 +1,22 @@
+{
+  "problem_id": "lowRISC/ibex/d78e0d9a068b4b37b79d205a1f3de1fea907e07d",
+  "repo_url": "https://github.com/lowRISC/ibex",
+  "owner": "lowRISC",
+  "repo_name": "ibex",
+  "fix_commit": "d78e0d9a068b4b37b79d205a1f3de1fea907e07d",
+  "buggy_rtl_commit": "50be975226e8d8a16f405e20e3dcd55c4b89a66e",
+  "fix_commit_msg": "[rtl] Hard wire dcsr.stepie to 0\n\nThis indicates interrupts do not occur in single step mode.\n\nFixes #1279",
+  "description": "[rtl] Hard wire dcsr.stepie to 0\n\nThis indicates interrupts do not occur in single step mode.\n\nFixes #1279",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl/",
+  "dv_dir": "dv/cs_registers",
+  "rtl_files_changed": [
+    "rtl/ibex_cs_registers.sv"
+  ],
+  "test_commands": [
+    "TOP_MODULE=tb_csr_dcsr_stepie TB_FILE=problems/lowRISC/ibex/tb_d78e0d9a.sv bash problems/lowRISC/ibex/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/ibex_controller.sv b/rtl/ibex_controller.sv\nindex 32897a1e..26dbf3c4 100644\n--- a/rtl/ibex_controller.sv\n+++ b/rtl/ibex_controller.sv\n@@ -316,9 +316,10 @@ module ibex_controller #(\n   // memory) before it has had anything to single step.\n   // Also enter debug mode on a trigger match (hardware breakpoint)\n \n-  // Set `do_single_step_q` when a valid instruction is seen outside of debug mode. The first valid\n-  // instruction on debug mode entry will clear it. Hold its value when there is no valid\n-  // instruction so `do_single_step_d` remains asserted until debug mode is entered.\n+  // Set `do_single_step_q` when a valid instruction is seen outside of debug mode and core is in\n+  // single step mode. The first valid instruction on debug mode entry will clear it. Hold its value\n+  // when there is no valid instruction so `do_single_step_d` remains asserted until debug mode is\n+  // entered.\n   assign do_single_step_d = instr_valid_i ? ~debug_mode_q & debug_single_step_i : do_single_step_q;\n   // Enter debug mode due to:\n   // * external `debug_req_i`\ndiff --git a/rtl/ibex_cs_registers.sv b/rtl/ibex_cs_registers.sv\nindex 39ce15d0..162f2712 100644\n--- a/rtl/ibex_cs_registers.sv\n+++ b/rtl/ibex_cs_registers.sv\n@@ -564,6 +564,9 @@ module ibex_cs_registers #(\n           // Read-only for SW\n           dcsr_d.cause = dcsr_q.cause;\n \n+          // Interrupts always disabled during single stepping\n+          dcsr_d.stepie = 1'b0;\n+\n           // currently not supported:\n           dcsr_d.nmip = 1'b0;\n           dcsr_d.mprven = 1'b0;",
+  "rtl_diff_lines": 10,
+  "source": "historical"
+}

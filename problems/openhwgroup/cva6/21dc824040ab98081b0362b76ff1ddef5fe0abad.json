@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/21dc824040ab98081b0362b76ff1ddef5fe0abad",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "21dc824040ab98081b0362b76ff1ddef5fe0abad",
+  "buggy_rtl_commit": "53472eb02683e916a77132ed9457ce6a44ee7833",
+  "fix_commit_msg": "Fix pmpaddr read logic considering G=2 (#2469)\n\nfixes #2465",
+  "description": "Fix pmpaddr read logic considering G=2 (#2469)\n\nfixes #2465",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/csr_regfile.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_21dc8240.sh"
+  ],
+  "rtl_diff": "diff --git a/core/csr_regfile.sv b/core/csr_regfile.sv\nindex 8d36d3f9..0c996e2d 100644\n--- a/core/csr_regfile.sv\n+++ b/core/csr_regfile.sv\n@@ -854,8 +854,8 @@ module csr_regfile\n           // -> last bit of pmpaddr must be set 0/1 based on the mode:\n           // NA4, NAPOT: 1\n           // TOR, OFF:   0\n-          if (pmpcfg_q[index].addr_mode[1] == 1'b1 || pmpcfg_q[index].addr_mode == 'h0)\n-            csr_rdata = pmpaddr_q[index][CVA6Cfg.PLEN-3:0];\n+          if (pmpcfg_q[index].addr_mode[1] == 1'b1)\n+            csr_rdata = {pmpaddr_q[index][CVA6Cfg.PLEN-3:1], 1'b1};\n           else csr_rdata = {pmpaddr_q[index][CVA6Cfg.PLEN-3:1], 1'b0};\n         end\n         default: read_access_exception = 1'b1;",
+  "rtl_diff_lines": 4,
+  "source": "historical"
+}

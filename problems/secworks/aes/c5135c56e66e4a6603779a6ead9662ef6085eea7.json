@@ -1,0 +1,22 @@
+{
+  "problem_id": "secworks/aes/c5135c56e66e4a6603779a6ead9662ef6085eea7",
+  "repo_url": "https://github.com/secworks/aes",
+  "owner": "secworks",
+  "repo_name": "aes",
+  "fix_commit": "c5135c56e66e4a6603779a6ead9662ef6085eea7",
+  "buggy_rtl_commit": "483ecc51eab4af20d3e437a9508a85606f41e428",
+  "fix_commit_msg": "HEADSUP: This commit changes order of API config and status address to match what is used in other cores. VERSION updated to reflect API change. NAME change to remove incorrect notion that the core only is 128 bit capable.",
+  "description": "HEADSUP: This commit changes order of API config and status address to match what is used in other cores. VERSION updated to reflect API change. NAME change to remove incorrect notion that the core only is 128 bit capable.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src/rtl",
+  "dv_dir": "src/tb",
+  "rtl_files_changed": [
+    "src/rtl/aes.v"
+  ],
+  "test_commands": [
+    "bash problems/secworks/aes/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/src/rtl/aes.v b/src/rtl/aes.v\nindex 6dcf610..8490f93 100644\n--- a/src/rtl/aes.v\n+++ b/src/rtl/aes.v\n@@ -62,14 +62,14 @@ module aes(\n   localparam CTRL_INIT_BIT    = 0;\n   localparam CTRL_NEXT_BIT    = 1;\n \n-  localparam ADDR_CONFIG      = 8'h09;\n-  localparam CTRL_ENCDEC_BIT  = 0;\n-  localparam CTRL_KEYLEN_BIT  = 1;\n-\n-  localparam ADDR_STATUS      = 8'h0a;\n+  localparam ADDR_STATUS      = 8'h09;\n   localparam STATUS_READY_BIT = 0;\n   localparam STATUS_VALID_BIT = 1;\n \n+  localparam ADDR_CONFIG      = 8'h0a;\n+  localparam CTRL_ENCDEC_BIT  = 0;\n+  localparam CTRL_KEYLEN_BIT  = 1;\n+\n   localparam ADDR_KEY0        = 8'h10;\n   localparam ADDR_KEY7        = 8'h17;\n \n@@ -83,9 +83,9 @@ module aes(\n   localparam ADDR_RESULT2     = 8'h32;\n   localparam ADDR_RESULT3     = 8'h33;\n \n-  localparam CORE_NAME0       = 32'h6165732d; // \"aes-\"\n-  localparam CORE_NAME1       = 32'h31323820; // \"128 \"\n-  localparam CORE_VERSION     = 32'h302e3530; // \"0.50\"\n+  localparam CORE_NAME0       = 32'h61657320; // \"aes \"\n+  localparam CORE_NAME1       = 32'h20202020; // \"    \"\n+  localparam CORE_VERSION     = 32'h302e3630; // \"0.60\"\n \n \n   //----------------------------------------------------------------",
+  "rtl_diff_lines": 16,
+  "source": "historical"
+}

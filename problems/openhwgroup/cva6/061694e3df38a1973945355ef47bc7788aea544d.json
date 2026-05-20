@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/061694e3df38a1973945355ef47bc7788aea544d",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "061694e3df38a1973945355ef47bc7788aea544d",
+  "buggy_rtl_commit": "f9c7542e848405c6464e156bcb3c2b247bd90ff2",
+  "fix_commit_msg": "csr regfile: force `mstatus.UBE` to `0` (see #1417) (#1626)\n\nas CVA6 is little endian\n\nSigned-off-by: Andr\u00e9 Sintzoff <andre.sintzoff@thalesgroup.com>",
+  "description": "csr regfile: force `mstatus.UBE` to `0` (see #1417) (#1626)\n\nas CVA6 is little endian\n\nSigned-off-by: Andr\u00e9 Sintzoff <andre.sintzoff@thalesgroup.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/csr_regfile.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_061694e3.sh"
+  ],
+  "rtl_diff": "diff --git a/core/csr_regfile.sv b/core/csr_regfile.sv\nindex e500ac83..86b03421 100644\n--- a/core/csr_regfile.sv\n+++ b/core/csr_regfile.sv\n@@ -789,6 +789,7 @@ module csr_regfile\n           mstatus_d.wpri1 = 1'b0;\n           mstatus_d.wpri2 = 1'b0;\n           mstatus_d.wpri0 = 1'b0;\n+          mstatus_d.ube   = 1'b0;  // CVA6 is little-endian\n           // this register has side-effects on other registers, flush the pipeline\n           flush_o         = 1'b1;\n         end",
+  "rtl_diff_lines": 1,
+  "source": "historical"
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "openhwgroup/cvw/9116ffa45d52e627a656c4b90f145ad7a18b4e62",
+  "repo_url": "https://github.com/openhwgroup/cvw",
+  "owner": "openhwgroup",
+  "repo_name": "cvw",
+  "fix_commit": "9116ffa45d52e627a656c4b90f145ad7a18b4e62",
+  "buggy_rtl_commit": "37c68798056f652a99dcea69e1b8f1e851cc3404",
+  "fix_commit_msg": "Fixed Issue #1147 that w-type shifts do not throw illegal instruction trap in RV32GC",
+  "description": "Fixed Issue #1147 that w-type shifts do not throw illegal instruction trap in RV32GC",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "testbench",
+  "rtl_files_changed": [
+    "src/ieu/bmu/bmuctrl.sv",
+    "src/ieu/controller.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cvw/run_tb_9116ffa4.sh"
+  ],
+  "rtl_diff": "diff --git a/src/ieu/bmu/bmuctrl.sv b/src/ieu/bmu/bmuctrl.sv\nindex e55c24fa..f9c524ec 100644\n--- a/src/ieu/bmu/bmuctrl.sv\n+++ b/src/ieu/bmu/bmuctrl.sv\n@@ -152,12 +152,17 @@ module bmuctrl import cvw::*;  #(parameter cvw_t P) (\n         endcase\n     end\n     if (P.ZBB_SUPPORTED | P.ZBS_SUPPORTED) // rv32i/64i shift instructions need BMU ALUSelect when BMU shifter is used\n-      if (P.XLEN == 64 | !Funct7D[0]) // rv32i shifts cannot shift by more than 31\n+      if (P.XLEN == 64 | !Funct7D[0]) \n         casez({OpD, Funct7D, Funct3D})\n-          17'b0110011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_0_0_1_0_0_0_0_0;  // sra, srl, sll\n-          17'b0010011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_0_0_1_0_0_0_0_0;  // srai, srli, slli\n-          17'b0111011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_1_0_1_0_0_0_0_0;  // sraw, srlw, sllw\n-          17'b0011011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_1_0_1_0_0_0_0_0;  // sraiw, srliw, slliw\n+          // rv32i shifts cannot shift by more than 31.  w-type shifts only supported in RV64\n+          17'b0110011_000000?_001: if (P.XLEN == 64 | !Funct7D[0]) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_0_0_1_0_0_0_0_0;  // sll\n+          17'b0110011_0?0000?_101: if (P.XLEN == 64 | !Funct7D[0]) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_0_0_1_0_0_0_0_0;  // sra, srl\n+          17'b0010011_000000?_001: if (P.XLEN == 64 | !Funct7D[0]) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_0_0_1_0_0_0_0_0;  // slli\n+          17'b0010011_0?0000?_101: if (P.XLEN == 64 | !Funct7D[0]) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_0_0_1_0_0_0_0_0;  // srai, srli\n+          17'b0111011_0000000_001: if (P.XLEN == 64) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_1_0_1_0_0_0_0_0;  // sllw\n+          17'b0111011_0?00000_101: if (P.XLEN == 64) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_1_0_1_0_0_0_0_0;  // sraw, srlw\n+          17'b0011011_0000000_001: if (P.XLEN == 64) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_1_0_1_0_0_0_0_0;  // slliw\n+          17'b0011011_0?00000_101: if (P.XLEN == 64) BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_1_0_1_0_0_0_0_0;  // sraiw, srliw\n         endcase\n     \n     if (P.ZBKB_SUPPORTED) begin // ZBKB Bitmanip\ndiff --git a/src/ieu/controller.sv b/src/ieu/controller.sv\nindex 19f96c98..4f1f778c 100644\n--- a/src/ieu/controller.sv\n+++ b/src/ieu/controller.sv\n@@ -300,7 +300,6 @@ module controller import cvw::*;  #(parameter cvw_t P) (\n   // Squash control signals if coming from an illegal compressed instruction\n   // On RV32E, can't write to upper 16 registers.  Checking reads to upper 16 is more costly so disregard them.\n   assign IllegalERegAdrD = P.E_SUPPORTED & P.ZICSR_SUPPORTED & ControlsD[`CTRLW-1] & InstrD[11]; \n-  //assign IllegalBaseInstrD = 1'b0;\n   assign {BaseRegWriteD, PreImmSrcD, ALUSrcAD, BaseALUSrcBD, MemRWD,\n           ResultSrcD, BranchD, ALUOpD, JumpD, ALUResultSrcD, BaseW64D, CSRReadD, \n           PrivilegedD, FenceXD, MDUD, AtomicD, CMOD, unused} = IllegalIEUFPUInstrD ? `CTRLW'b0 : ControlsD;",
+  "rtl_diff_lines": 16,
+  "source": "historical"
+}

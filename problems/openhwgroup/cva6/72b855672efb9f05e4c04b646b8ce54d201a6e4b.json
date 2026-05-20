@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/72b855672efb9f05e4c04b646b8ce54d201a6e4b",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "72b855672efb9f05e4c04b646b8ce54d201a6e4b",
+  "buggy_rtl_commit": "2708df998d55bc3c826a850ef567558b29fd633c",
+  "fix_commit_msg": "Fix inhibit impact on MCYCLE csr (#1743)",
+  "description": "Fix inhibit impact on MCYCLE csr (#1743)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/csr_regfile.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_72b85567.sh"
+  ],
+  "rtl_diff": "diff --git a/core/csr_regfile.sv b/core/csr_regfile.sv\nindex fa7248c5..87b7da0b 100644\n--- a/core/csr_regfile.sv\n+++ b/core/csr_regfile.sv\n@@ -569,7 +569,7 @@ module csr_regfile\n       instret_d = instret;\n       // increment the cycle count\n       if (!mcountinhibit_q[0]) cycle_d = cycle_q + 1'b1;\n-      else cycle_d = instret;\n+      else cycle_d = cycle_q;\n     end\n \n     eret_o                  = 1'b0;",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

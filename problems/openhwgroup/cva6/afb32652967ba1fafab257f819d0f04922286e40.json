@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/afb32652967ba1fafab257f819d0f04922286e40",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "afb32652967ba1fafab257f819d0f04922286e40",
+  "buggy_rtl_commit": "7ccf82ce76fcdbc45e873b0b67b86190df554647",
+  "fix_commit_msg": "csr_regfile.sv: if no U-mode, mcounteren does not exist (fix #2221) (#2227)",
+  "description": "csr_regfile.sv: if no U-mode, mcounteren does not exist (fix #2221) (#2227)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/csr_regfile.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_afb32652.sh"
+  ],
+  "rtl_diff": "diff --git a/core/csr_regfile.sv b/core/csr_regfile.sv\nindex 3f6ee04b..1914dcb4 100644\n--- a/core/csr_regfile.sv\n+++ b/core/csr_regfile.sv\n@@ -525,7 +525,9 @@ module csr_regfile\n         else read_access_exception = 1'b1;\n         riscv::CSR_MIE: csr_rdata = mie_q;\n         riscv::CSR_MTVEC: csr_rdata = mtvec_q;\n-        riscv::CSR_MCOUNTEREN: csr_rdata = mcounteren_q;\n+        riscv::CSR_MCOUNTEREN:\n+        if (CVA6Cfg.RVU) csr_rdata = mcounteren_q;\n+        else read_access_exception = 1'b1;\n         riscv::CSR_MSCRATCH: csr_rdata = mscratch_q;\n         riscv::CSR_MEPC: csr_rdata = mepc_q;\n         riscv::CSR_MCAUSE: csr_rdata = mcause_q;",
+  "rtl_diff_lines": 4,
+  "source": "historical"
+}

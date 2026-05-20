@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cva6/faf4536b3756ae7b62058a19996a340ca2f3e794",
+  "repo_url": "https://github.com/openhwgroup/cva6",
+  "owner": "openhwgroup",
+  "repo_name": "cva6",
+  "fix_commit": "faf4536b3756ae7b62058a19996a340ca2f3e794",
+  "buggy_rtl_commit": "53b51ac5a7d9e9a40e1f0f6b98514af50d768999",
+  "fix_commit_msg": "fix #2464: exception is not generated when INHIBIT CSR is accessed (#2468)",
+  "description": "fix #2464: exception is not generated when INHIBIT CSR is accessed (#2468)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "core",
+  "dv_dir": "corev_apu/tb",
+  "rtl_files_changed": [
+    "core/csr_regfile.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cva6/run_tb_faf4536b.sh"
+  ],
+  "rtl_diff": "diff --git a/core/csr_regfile.sv b/core/csr_regfile.sv\nindex f12f356c..8d36d3f9 100644\n--- a/core/csr_regfile.sv\n+++ b/core/csr_regfile.sv\n@@ -553,9 +553,7 @@ module csr_regfile\n         riscv::CSR_MHARTID: csr_rdata = hart_id_i;\n         riscv::CSR_MCONFIGPTR: csr_rdata = '0;  // not implemented\n         riscv::CSR_MCOUNTINHIBIT:\n-        if (CVA6Cfg.PerfCounterEn)\n-          csr_rdata = {{(CVA6Cfg.XLEN - (MHPMCounterNum + 3)) {1'b0}}, mcountinhibit_q};\n-        else read_access_exception = 1'b1;\n+        csr_rdata = {{(CVA6Cfg.XLEN - (MHPMCounterNum + 3)) {1'b0}}, mcountinhibit_q};\n         // Counters and Timers\n         riscv::CSR_MCYCLE: csr_rdata = cycle_q[CVA6Cfg.XLEN-1:0];\n         riscv::CSR_MCYCLEH:\n@@ -1494,7 +1492,7 @@ module csr_regfile\n         riscv::CSR_MCOUNTINHIBIT:\n         if (CVA6Cfg.PerfCounterEn)\n           mcountinhibit_d = {csr_wdata[MHPMCounterNum+2:2], 1'b0, csr_wdata[0]};\n-        else update_access_exception = 1'b1;\n+        else mcountinhibit_d = '0;\n         // performance counters\n         riscv::CSR_MCYCLE: cycle_d[CVA6Cfg.XLEN-1:0] = csr_wdata;\n         riscv::CSR_MCYCLEH:",
+  "rtl_diff_lines": 6,
+  "source": "historical"
+}

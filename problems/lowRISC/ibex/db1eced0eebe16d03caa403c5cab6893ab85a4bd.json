@@ -1,0 +1,22 @@
+{
+  "problem_id": "lowRISC/ibex/db1eced0eebe16d03caa403c5cab6893ab85a4bd",
+  "repo_url": "https://github.com/lowRISC/ibex",
+  "owner": "lowRISC",
+  "repo_name": "ibex",
+  "fix_commit": "db1eced0eebe16d03caa403c5cab6893ab85a4bd",
+  "buggy_rtl_commit": "7e9eef2cf97f7c3d082ada5de60ff4a60a07394f",
+  "fix_commit_msg": "[rtl] Make PMP CSRs illegal in non PMP configurations\n\nThe previous behaviour was also acceptable but this matches spike.",
+  "description": "[rtl] Make PMP CSRs illegal in non PMP configurations\n\nThe previous behaviour was also acceptable but this matches spike.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl/",
+  "dv_dir": "dv/cs_registers",
+  "rtl_files_changed": [
+    "rtl/ibex_cs_registers.sv"
+  ],
+  "test_commands": [
+    "TOP_MODULE=tb_csr_pmp_disabled_illegal TB_FILE=problems/lowRISC/ibex/tb_db1eced0.sv bash problems/lowRISC/ibex/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/ibex_cs_registers.sv b/rtl/ibex_cs_registers.sv\nindex 07dc728f..d1d791ae 100644\n--- a/rtl/ibex_cs_registers.sv\n+++ b/rtl/ibex_cs_registers.sv\n@@ -508,6 +508,16 @@ module ibex_cs_registers #(\n         illegal_csr = 1'b1;\n       end\n     endcase\n+\n+    if (!PMPEnable) begin\n+      if (csr_addr inside {CSR_PMPCFG0,   CSR_PMPCFG1,   CSR_PMPCFG2,   CSR_PMPCFG3,\n+                           CSR_PMPADDR0,  CSR_PMPADDR1,  CSR_PMPADDR2,  CSR_PMPADDR3,\n+                           CSR_PMPADDR4,  CSR_PMPADDR5,  CSR_PMPADDR6,  CSR_PMPADDR7,\n+                           CSR_PMPADDR8,  CSR_PMPADDR9,  CSR_PMPADDR10, CSR_PMPADDR11,\n+                           CSR_PMPADDR12, CSR_PMPADDR13, CSR_PMPADDR14, CSR_PMPADDR15}) begin\n+        illegal_csr = 1'b1;\n+      end\n+    end\n   end\n \n   // write logic",
+  "rtl_diff_lines": 10,
+  "source": "historical"
+}

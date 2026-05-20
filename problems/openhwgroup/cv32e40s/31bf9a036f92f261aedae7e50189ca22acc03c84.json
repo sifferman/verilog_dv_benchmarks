@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cv32e40s/31bf9a036f92f261aedae7e50189ca22acc03c84",
+  "repo_url": "https://github.com/openhwgroup/cv32e40s",
+  "owner": "openhwgroup",
+  "repo_name": "cv32e40s",
+  "fix_commit": "31bf9a036f92f261aedae7e50189ca22acc03c84",
+  "buggy_rtl_commit": "37fec7643925f4822326af992805f0bc1b5043f8",
+  "fix_commit_msg": "Implemented cm.lbu and cm.lhu from Zc C2.\nBugfix for c.sh, did not flag illegal instruction if bit 6 was set.\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "description": "Implemented cm.lbu and cm.lhu from Zc C2.\nBugfix for c.sh, did not flag illegal instruction if bit 6 was set.\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "tb",
+  "rtl_files_changed": [
+    "rtl/cv32e40x_compressed_decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cv32e40s/run_tb_31bf9a03.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/cv32e40x_compressed_decoder.sv b/rtl/cv32e40x_compressed_decoder.sv\nindex 427f2a9c..58cea2ce 100644\n--- a/rtl/cv32e40x_compressed_decoder.sv\n+++ b/rtl/cv32e40x_compressed_decoder.sv\n@@ -119,6 +119,8 @@ module cv32e40x_compressed_decoder import cv32e40x_pkg::*;\n                   3'b011: begin\n                     // c.sh -> sh rs2', imm(rs1')\n                     instr_o.bus_resp.rdata = {7'b0, 2'b01, instr[4:2], 2'b01, instr[9:7], 3'b001, 3'b000, instr[5], 1'b0, OPCODE_STORE};\n+\n+                    if (instr[6]) illegal_instr_o = 1'b1;\n                   end\n                   default: begin\n                     illegal_instr_o = 1'b1;\n@@ -339,12 +341,34 @@ module cv32e40x_compressed_decoder import cv32e40x_pkg::*;\n               end\n             end\n \n+            3'b001: begin\n+              if (ZC_EXT) begin\n+                // cm.lbu rd', uimm(rs1') -> lbu rd', uimm(rs1')\n+                instr_o.bus_resp.rdata = {8'h00, instr[10], instr[6:5], instr[11], 2'b01, instr[9:7], 3'b100, 2'b01, instr[4:2], OPCODE_LOAD};\n+\n+                if (instr[12]) illegal_instr_o = 1'b1;\n+              end else begin\n+                instr_o.bus_resp.rdata = {4'b0, instr[3:2], instr[12], instr[6:4], 2'b00, 5'h02, 3'b010, instr[11:7], OPCODE_LOAD};\n+                illegal_instr_o = 1'b1;\n+              end\n+            end\n             3'b010: begin\n               // c.lwsp -> lw rd, imm(x2)\n               instr_o.bus_resp.rdata = {4'b0, instr[3:2], instr[12], instr[6:4], 2'b00, 5'h02, 3'b010, instr[11:7], OPCODE_LOAD};\n               if (instr[11:7] == 5'b0)  illegal_instr_o = 1'b1;\n             end\n \n+            3'b011: begin\n+              if (ZC_EXT) begin\n+                // cm.lhu rd', uimm(rs1') -> lhu rd', uimm(rs1')\n+                instr_o.bus_resp.rdata = {7'b0000000, instr[11:10], instr[6:5], 1'b0, 2'b01, instr[9:7], 3'b101, 2'b01, instr[4:2], OPCODE_LOAD};\n+\n+                if (!instr[12]) illegal_instr_o = 1'b1;\n+              end else begin\n+                instr_o.bus_resp.rdata = {4'b0, instr[3:2], instr[12], instr[6:4], 2'b00, 5'h02, 3'b010, instr[11:7], OPCODE_LOAD};\n+                illegal_instr_o = 1'b1;\n+              end\n+            end\n             3'b100: begin\n               if (instr[12] == 1'b0) begin\n                 if (instr[6:2] == 5'b0) begin\n@@ -391,8 +415,6 @@ module cv32e40x_compressed_decoder import cv32e40x_pkg::*;\n               instr_o.bus_resp.rdata = {4'b0, instr[8:7], instr[12], instr[6:2], 5'h02, 3'b010, instr[11:9], 2'b00, OPCODE_STORE};\n             end\n \n-            3'b001,        // c.fldsp -> fld rd, imm(x2)\n-            3'b011,        // c.flwsp -> flw rd, imm(x2)\n             3'b101,        // c.fsdsp -> fsd rs2, imm(x2)\n             3'b111: begin  // c.fswsp -> fsw rs2, imm(x2)\n               instr_o.bus_resp.rdata = {4'b0, instr[3:2], instr[12], instr[6:4], 2'b00, 5'h02, 3'b010, instr[11:7], OPCODE_LOAD};",
+  "rtl_diff_lines": 26,
+  "source": "historical"
+}

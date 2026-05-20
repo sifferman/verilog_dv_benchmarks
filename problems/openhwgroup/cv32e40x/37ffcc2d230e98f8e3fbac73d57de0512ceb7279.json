@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cv32e40x/37ffcc2d230e98f8e3fbac73d57de0512ceb7279",
+  "repo_url": "https://github.com/openhwgroup/cv32e40x",
+  "owner": "openhwgroup",
+  "repo_name": "cv32e40x",
+  "fix_commit": "37ffcc2d230e98f8e3fbac73d57de0512ceb7279",
+  "buggy_rtl_commit": "df7aab4",
+  "fix_commit_msg": "Instruction sext.b used wrong encoding, resulting in illegal instruction.\n\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "description": "Instruction sext.b used wrong encoding, resulting in illegal instruction.\n\nSigned-off-by: Oystein Knauserud <Oystein.Knauserud@silabs.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "bhv",
+  "rtl_files_changed": [
+    "rtl/cv32e40x_b_decoder.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cv32e40x/run_tb_37ffcc2d.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/cv32e40x_b_decoder.sv b/rtl/cv32e40x_b_decoder.sv\nindex 18bd47c..96e93fe 100644\n--- a/rtl/cv32e40x_b_decoder.sv\n+++ b/rtl/cv32e40x_b_decoder.sv\n@@ -243,7 +243,7 @@ module cv32e40x_b_decoder import cv32e40x_pkg::*;\n             end\n           end\n \n-          {7'b110_0000, 5'b0_0100, 3'b001}: begin\n+          {7'b011_0000, 5'b0_0100, 3'b001}: begin\n             if (RV32B_ZBB) begin\n               decoder_ctrl_o.illegal_insn = 1'b0;\n               decoder_ctrl_o.alu_operator = ALU_B_SEXT_B;",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

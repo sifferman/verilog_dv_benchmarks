@@ -1,0 +1,22 @@
+{
+  "problem_id": "lowRISC/ibex/7071b04a6687a09d9a7fa00ce7be4a3e23cab8da",
+  "repo_url": "https://github.com/lowRISC/ibex",
+  "owner": "lowRISC",
+  "repo_name": "ibex",
+  "fix_commit": "7071b04a6687a09d9a7fa00ce7be4a3e23cab8da",
+  "buggy_rtl_commit": "7ceff60749bc5907bd720d554ce2fa6fe997d34d",
+  "fix_commit_msg": "[rtl] Fix typo in MCOUNTEREN\n\nDbgTriggerEn has no impact on whether this is an illegal csr op.\n\nFixes #1379\n\nSigned-off-by: Tom Roberts <tomroberts@lowrisc.org>",
+  "description": "[rtl] Fix typo in MCOUNTEREN\n\nDbgTriggerEn has no impact on whether this is an illegal csr op.\n\nFixes #1379\n\nSigned-off-by: Tom Roberts <tomroberts@lowrisc.org>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl/",
+  "dv_dir": "dv/cs_registers",
+  "rtl_files_changed": [
+    "rtl/ibex_cs_registers.sv"
+  ],
+  "test_commands": [
+    "TOP_MODULE=tb_csr_mcounteren TB_FILE=problems/lowRISC/ibex/tb_7071b04a.sv bash problems/lowRISC/ibex/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/ibex_cs_registers.sv b/rtl/ibex_cs_registers.sv\nindex 50a34a21..75ef2e5d 100644\n--- a/rtl/ibex_cs_registers.sv\n+++ b/rtl/ibex_cs_registers.sv\n@@ -322,7 +322,6 @@ module ibex_cs_registers #(\n       // mcounteren: machine counter enable\n       CSR_MCOUNTEREN: begin\n         csr_rdata_int = '0;\n-        illegal_csr   = ~DbgTriggerEn;\n       end\n \n       CSR_MSCRATCH: csr_rdata_int = mscratch_q;",
+  "rtl_diff_lines": 1,
+  "source": "historical"
+}

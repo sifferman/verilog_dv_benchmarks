@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cvw/155d1d511b56632c21e3b22fd849b8cd34aa2467",
+  "repo_url": "https://github.com/openhwgroup/cvw",
+  "owner": "openhwgroup",
+  "repo_name": "cvw",
+  "fix_commit": "155d1d511b56632c21e3b22fd849b8cd34aa2467",
+  "buggy_rtl_commit": "58bfc27c63135011f2b25a3767ce625b18f853fb",
+  "fix_commit_msg": "Fixed funct7 code for sinval.vma (issue #1154)",
+  "description": "Fixed funct7 code for sinval.vma (issue #1154)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "testbench",
+  "rtl_files_changed": [
+    "src/privileged/privdec.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cvw/run_tb_155d1d51.sh"
+  ],
+  "rtl_diff": "diff --git a/src/privileged/privdec.sv b/src/privileged/privdec.sv\nindex 6321413d..99380e63 100644\n--- a/src/privileged/privdec.sv\n+++ b/src/privileged/privdec.sv\n@@ -59,7 +59,7 @@ module privdec import cvw::*;  #(parameter cvw_t P) (\n   \n   // svinval instructions\n   // any svinval instruction is treated as sfence.vma on Wally\n-  assign sinvalvmaM =     (InstrM[31:25] == 7'b0001001);\n+  assign sinvalvmaM =     (InstrM[31:25] ==  7'b0001011);\n   assign sfencewinvalM  = (InstrM[31:20] == 12'b000110000000) & rs1zeroM;\n   assign sfenceinvalirM = (InstrM[31:20] == 12'b000110000001) & rs1zeroM;\n   assign invalM =         P.SVINVAL_SUPPORTED & (sinvalvmaM | sfencewinvalM | sfenceinvalirM);",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

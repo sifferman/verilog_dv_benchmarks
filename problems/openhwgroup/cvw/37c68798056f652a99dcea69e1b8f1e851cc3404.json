@@ -1,0 +1,22 @@
+{
+  "problem_id": "openhwgroup/cvw/37c68798056f652a99dcea69e1b8f1e851cc3404",
+  "repo_url": "https://github.com/openhwgroup/cvw",
+  "owner": "openhwgroup",
+  "repo_name": "cvw",
+  "fix_commit": "37c68798056f652a99dcea69e1b8f1e851cc3404",
+  "buggy_rtl_commit": "6cee6fed635b09d3cdca8ced49a09b09febff900",
+  "fix_commit_msg": "Fixed decoder bug that doesn't throw illegal instruction exception for RV32 immediate shifts by more than 31",
+  "description": "Fixed decoder bug that doesn't throw illegal instruction exception for RV32 immediate shifts by more than 31",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "testbench",
+  "rtl_files_changed": [
+    "src/ieu/bmu/bmuctrl.sv"
+  ],
+  "test_commands": [
+    "bash problems/openhwgroup/cvw/run_tb_37c68798.sh"
+  ],
+  "rtl_diff": "diff --git a/src/ieu/bmu/bmuctrl.sv b/src/ieu/bmu/bmuctrl.sv\nindex d4a8afe2..e55c24fa 100644\n--- a/src/ieu/bmu/bmuctrl.sv\n+++ b/src/ieu/bmu/bmuctrl.sv\n@@ -152,12 +152,13 @@ module bmuctrl import cvw::*;  #(parameter cvw_t P) (\n         endcase\n     end\n     if (P.ZBB_SUPPORTED | P.ZBS_SUPPORTED) // rv32i/64i shift instructions need BMU ALUSelect when BMU shifter is used\n-      casez({OpD, Funct7D, Funct3D})\n-        17'b0110011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_0_0_1_0_0_0_0_0;  // sra, srl, sll\n-        17'b0010011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_0_0_1_0_0_0_0_0;  // srai, srli, slli\n-        17'b0111011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_1_0_1_0_0_0_0_0;  // sraw, srlw, sllw\n-        17'b0011011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_1_0_1_0_0_0_0_0;  // sraiw, srliw, slliw\n-      endcase\n+      if (P.XLEN == 64 | !Funct7D[0]) // rv32i shifts cannot shift by more than 31\n+        casez({OpD, Funct7D, Funct3D})\n+          17'b0110011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_0_0_1_0_0_0_0_0;  // sra, srl, sll\n+          17'b0010011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_0_0_1_0_0_0_0_0;  // srai, srli, slli\n+          17'b0111011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_0_1_0_1_0_0_0_0_0;  // sraw, srlw, sllw\n+          17'b0011011_0?0000?_?01: BMUControlsD = `BMUCTRLW'b001_0000_0000_1_1_1_0_1_0_0_0_0_0;  // sraiw, srliw, slliw\n+        endcase\n     \n     if (P.ZBKB_SUPPORTED) begin // ZBKB Bitmanip\n       casez({OpD,Funct7D, Funct3D})",
+  "rtl_diff_lines": 13,
+  "source": "historical"
+}

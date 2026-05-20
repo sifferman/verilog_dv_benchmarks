@@ -1,0 +1,22 @@
+{
+  "problem_id": "chipsalliance/Cores-VeeR-EL2/2231e49be318b5532c80dedd4158e9a19a6051e4",
+  "repo_url": "https://github.com/chipsalliance/Cores-VeeR-EL2",
+  "owner": "chipsalliance",
+  "repo_name": "Cores-VeeR-EL2",
+  "fix_commit": "2231e49be318b5532c80dedd4158e9a19a6051e4",
+  "buggy_rtl_commit": "34263e1ab96240ab50930fb02ea1d4ddfd735c71",
+  "fix_commit_msg": "Fix PMPCFG not being WARL, prohibit writing WR=10 combination.\n\nInternal-tag: [#58150]\nSigned-off-by: Maciej Kurc <mkurc@antmicro.com>",
+  "description": "Fix PMPCFG not being WARL, prohibit writing WR=10 combination.\n\nInternal-tag: [#58150]\nSigned-off-by: Maciej Kurc <mkurc@antmicro.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "design",
+  "dv_dir": "testbench",
+  "rtl_files_changed": [
+    "design/dec/el2_dec_pmp_ctl.sv"
+  ],
+  "test_commands": [
+    "bash problems/chipsalliance/Cores-VeeR-EL2/run_tb_2231e49b.sh"
+  ],
+  "rtl_diff": "diff --git a/design/dec/el2_dec_pmp_ctl.sv b/design/dec/el2_dec_pmp_ctl.sv\nindex 537bcec..0f75a5a 100644\n--- a/design/dec/el2_dec_pmp_ctl.sv\n+++ b/design/dec/el2_dec_pmp_ctl.sv\n@@ -85,9 +85,17 @@ import el2_pkg::*;\n    assign wr_pmpcfg_group = dec_csr_wraddr_r[3:0]; // selects group of 4 pmpcfg entries (group 1 -> entries 4-7; up to 16 groups)\n \n    for (genvar entry_idx = 0; entry_idx < pt.PMP_ENTRIES; entry_idx++) begin : gen_pmpcfg_ff\n+      logic [7:0] raw_wdata;\n+      logic [7:0] csr_wdata;\n+\n+      // PMPCFG fields are WARL. Mask out bits 6:5 during write. Since R=0 and\n+      // W=1 combination is illegal mask out W when R is cleared.\n+      assign raw_wdata = dec_csr_wrdata_r[(entry_idx[1:0]*8)+7:(entry_idx[1:0]*8)+0];\n+      assign csr_wdata = (raw_wdata & 8'b00000001) ? (raw_wdata & 8'b10011111) : (raw_wdata & 8'b10011101);\n+\n       rvdffe #(8) pmpcfg_ff (.*, .clk(free_l2clk),\n                           .en(wr_pmpcfg_r & (wr_pmpcfg_group == entry_idx[5:2]) & (~pmp_pmpcfg[entry_idx].lock)),\n-                          .din(dec_csr_wrdata_r[(entry_idx[1:0]*8)+7:(entry_idx[1:0]*8)+0] & 8'b10011111),\n+                          .din(csr_wdata),\n                           .dout(pmp_pmpcfg[entry_idx]));\n    end",
+  "rtl_diff_lines": 10,
+  "source": "historical"
+}
