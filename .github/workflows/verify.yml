@@ -40,7 +40,8 @@ jobs:
           # module scope (used for their pytest entry points). Install the
           # shim packages into oss-cad-suite's Python so the import succeeds.
           "$GITHUB_WORKSPACE/oss-cad-suite/bin/tabbypy3" -m pip install --no-deps \
-            cocotb-test cocotbext-axi cocotbext-eth cocotbext-pcie cocotbext-uart cocotbext-i2c
+            cocotb-test cocotb-bus \
+            cocotbext-axi cocotbext-eth cocotbext-pcie cocotbext-uart cocotbext-i2c
 
       - name: Install riscv32-unknown-elf toolchain
         run: |
