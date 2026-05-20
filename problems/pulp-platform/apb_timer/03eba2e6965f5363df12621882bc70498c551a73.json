@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/apb_timer/03eba2e6965f5363df12621882bc70498c551a73",
+  "repo_url": "https://github.com/pulp-platform/apb_timer",
+  "owner": "pulp-platform",
+  "repo_name": "apb_timer",
+  "fix_commit": "03eba2e6965f5363df12621882bc70498c551a73",
+  "buggy_rtl_commit": "0cbc6cbc26c94b8e3bf27cc058c48ef89ea3d4c3",
+  "fix_commit_msg": "apb_timer.sv: Fix prescaler behavior (#6)\n\n* Fix prescaler counter to reset with prescaler value instead of full REG_TIMER_CTRL register\n\n* Fix overflow interrupt setting when prescaler is used\n\n* Fix cmp interrupt setting when prescaler is used",
+  "description": "apb_timer.sv: Fix prescaler behavior (#6)\n\n* Fix prescaler counter to reset with prescaler value instead of full REG_TIMER_CTRL register\n\n* Fix overflow interrupt setting when prescaler is used\n\n* Fix cmp interrupt setting when prescaler is used",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "src",
+  "rtl_files_changed": [
+    "src/timer.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/apb_timer/run_tb_03eba2e6.sh"
+  ],
+  "rtl_diff": "diff --git a/src/timer.sv b/src/timer.sv\nindex 1a3a4f1..5f7696d 100644\n--- a/src/timer.sv\n+++ b/src/timer.sv\n@@ -55,11 +55,11 @@ module timer\n         irq_o = 2'b0;\n \n         // overlow irq\n-        if (regs_q[`REG_TIMER] == 32'hffff_ffff)\n+        if (regs_q[`REG_TIMER] == 32'hffff_ffff && prescaler_int == cycle_counter_q)\n             irq_o[0] = 1'b1;\n \n         // compare match irq if compare reg ist set\n-        if (regs_q[`REG_CMP] != 'b0 && regs_q[`REG_TIMER] == regs_q[`REG_CMP])\n+        if (regs_q[`REG_CMP] != 'b0 && regs_q[`REG_TIMER] == regs_q[`REG_CMP] && prescaler_int == cycle_counter_q)\n             irq_o[1] = 1'b1;\n \n     end\n@@ -82,7 +82,7 @@ module timer\n             regs_n[`REG_TIMER] = regs_q[`REG_TIMER] + 1;\n \n         // reset prescaler cycle counter\n-        if (cycle_counter_q >= regs_q[`REG_TIMER_CTRL])\n+        if (cycle_counter_q >= prescaler_int)\n             cycle_counter_n = 32'b0;\n \n         // written from APB bus - gets priority",
+  "rtl_diff_lines": 6,
+  "source": "historical"
+}

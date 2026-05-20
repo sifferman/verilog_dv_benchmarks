@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/common_cells/554ebbcdd3d4d55f9d94dbee47f957af93a835a8",
+  "repo_url": "https://github.com/pulp-platform/common_cells",
+  "owner": "pulp-platform",
+  "repo_name": "common_cells",
+  "fix_commit": "554ebbcdd3d4d55f9d94dbee47f957af93a835a8",
+  "buggy_rtl_commit": "94d285b4b6f7b96649f9d3175e5a6500ec12de00",
+  "fix_commit_msg": "delta_counter: Fix inverted reset (#242)",
+  "description": "delta_counter: Fix inverted reset (#242)",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "test",
+  "rtl_files_changed": [
+    "src/delta_counter.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/common_cells/run_tb_554ebbcd.sh"
+  ],
+  "rtl_diff": "diff --git a/src/delta_counter.sv b/src/delta_counter.sv\nindex 415bd11..6cb4053 100644\n--- a/src/delta_counter.sv\n+++ b/src/delta_counter.sv\n@@ -31,7 +31,7 @@ module delta_counter #(\n \n         always_ff @(posedge clk_i or negedge rst_ni)\n         begin\n-            if(rst_ni) begin\n+            if(!rst_ni) begin\n                 overflow_q <= 1'b0;\n             end else begin\n                 overflow_q <= overflow_d;",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

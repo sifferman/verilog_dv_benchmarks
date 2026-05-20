@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/apb_event_unit/adcb49e7282e38b8d32e67fc5599df37c87ebad4",
+  "repo_url": "https://github.com/pulp-platform/apb_event_unit",
+  "owner": "pulp-platform",
+  "repo_name": "apb_event_unit",
+  "fix_commit": "adcb49e7282e38b8d32e67fc5599df37c87ebad4",
+  "buggy_rtl_commit": "5eea83b664283ba1bb525066850ea8e40854fa8e",
+  "fix_commit_msg": "Addressing bug fixed",
+  "description": "Addressing bug fixed",
+  "date_created": "2026-05-19",
+  "rtl_dir": ".",
+  "dv_dir": ".",
+  "rtl_files_changed": [
+    "apb_event_unit.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/apb_event_unit/run_tb_adcb49e7.sh"
+  ],
+  "rtl_diff": "diff --git a/apb_event_unit.sv b/apb_event_unit.sv\nindex 1db1f83..3c74fff 100644\n--- a/apb_event_unit.sv\n+++ b/apb_event_unit.sv\n@@ -37,7 +37,7 @@ logic [2:0] [31:0] prdata;\n // event from event unit in order to wake up the core after an event has occured\n logic event_int, core_sleeping_int;\n \n-assign slave_address_int = PADDR[`ADR_MAX_ADR + `REGS_MAX_ADR + 1:`REGS_MAX_IDX + 2];\n+assign slave_address_int = PADDR[`ADR_MAX_ADR + `REGS_MAX_ADR + 1:`REGS_MAX_ADR + 2];\n \n // address selector - select right peripheral\n always_comb\n@@ -59,7 +59,7 @@ begin\n     else\n     begin\n         PRDATA = 'b0;\n-        PREADY = 1'b0;\n+        PREADY = 1'b1;\n         PSLVERR = 1'b0;\n     end\n end",
+  "rtl_diff_lines": 4,
+  "source": "historical"
+}

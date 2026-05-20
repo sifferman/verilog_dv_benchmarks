@@ -1,0 +1,22 @@
+{
+  "problem_id": "secworks/cmac/1f0584b1c1a88a4104f5108bba864ccf6ac9fe45",
+  "repo_url": "https://github.com/secworks/cmac",
+  "owner": "secworks",
+  "repo_name": "cmac",
+  "fix_commit": "1f0584b1c1a88a4104f5108bba864ccf6ac9fe45",
+  "buggy_rtl_commit": "98fc7fdea2b2928e20ebe238bcd75c1ea357d386",
+  "fix_commit_msg": "(1) Fixed bug where blocks wasn't written to block regs. (2) Added block read task in tb. (3) Added more debig outputs to see tweaks. This commit fixes functionality to correctly generate ICV for a message with one block.",
+  "description": "(1) Fixed bug where blocks wasn't written to block regs. (2) Added block read task in tb. (3) Added more debig outputs to see tweaks. This commit fixes functionality to correctly generate ICV for a message with one block.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src/rtl",
+  "dv_dir": "src/tb",
+  "rtl_files_changed": [
+    "src/rtl/cmac.v"
+  ],
+  "test_commands": [
+    "bash problems/secworks/cmac/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/src/rtl/cmac.v b/src/rtl/cmac.v\nindex 7ebc4c4..455e8e7 100644\n--- a/src/rtl/cmac.v\n+++ b/src/rtl/cmac.v\n@@ -301,7 +301,7 @@ module cmac(\n                 key_we = 1;\n \n               if ((address >= ADDR_BLOCK0) && (address <= ADDR_BLOCK3))\n-                key_we = 1;\n+                block_we = 1;\n \n               case (address)\n                 ADDR_CTRL:",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

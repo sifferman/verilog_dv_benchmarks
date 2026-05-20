@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/hwpe-stream/01e39105b09d5a82a41a4b65faf4ddd15903761c",
+  "repo_url": "https://github.com/pulp-platform/hwpe-stream",
+  "owner": "pulp-platform",
+  "repo_name": "hwpe-stream",
+  "fix_commit": "01e39105b09d5a82a41a4b65faf4ddd15903761c",
+  "buggy_rtl_commit": "c1e25094bf9f2fee754611ef7491b7a1144e11b9",
+  "fix_commit_msg": "Fix passthrough FIFO behavior",
+  "description": "Fix passthrough FIFO behavior",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "rtl/verif",
+  "rtl_files_changed": [
+    "rtl/fifo/hwpe_stream_fifo_passthrough.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/hwpe-stream/run_tb_01e39105.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/fifo/hwpe_stream_fifo_passthrough.sv b/rtl/fifo/hwpe_stream_fifo_passthrough.sv\nindex 53c58e1..c0b1749 100644\n--- a/rtl/fifo/hwpe_stream_fifo_passthrough.sv\n+++ b/rtl/fifo/hwpe_stream_fifo_passthrough.sv\n@@ -103,18 +103,23 @@ module hwpe_stream_fifo_passthrough #(\n     .clk ( clk_i )\n   );\n \n-  logic passthrough;\n-  assign passthrough = push_i.valid & flags_o.empty;\n+  logic passthrough_rd;\n+  logic passthrough_wr;\n \n-  assign push.valid   = push_i.valid & ~passthrough;\n+  // if we have a valid input & an empty FIFO, we propagate the data to the read (pop) port\n+  assign passthrough_rd = push_i.valid & flags_o.empty;\n+  // if we also have a ready, we avoid writing in the FIFO at all!\n+  assign passthrough_wr = push_i.valid & pop_o.ready & flags_o.empty;\n+\n+  assign push.valid   = push_i.valid & ~passthrough_wr;\n   assign push.data    = push_i.data;\n   assign push.strb    = push_i.strb;\n-  assign push_i.ready = passthrough ? pop_o.ready  : push.ready;\n+  assign push_i.ready = passthrough_wr ? pop_o.ready  : push.ready;\n \n-  assign pop_o.valid  = passthrough ? push_i.valid : pop.valid;\n-  assign pop_o.data   = passthrough ? push_i.data  : pop.data;\n-  assign pop_o.strb   = passthrough ? push_i.strb  : pop.strb;\n-  assign pop.ready    = pop_o.ready & ~passthrough;\n+  assign pop_o.valid  = passthrough_rd ? push_i.valid : pop.valid;\n+  assign pop_o.data   = passthrough_rd ? push_i.data  : pop.data;\n+  assign pop_o.strb   = passthrough_rd ? push_i.strb  : pop.strb;\n+  assign pop.ready    = pop_o.ready & ~passthrough_rd;\n \n   hwpe_stream_fifo #(\n     .DATA_WIDTH           ( DATA_WIDTH           ),",
+  "rtl_diff_lines": 21,
+  "source": "historical"
+}

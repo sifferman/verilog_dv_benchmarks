@@ -1,0 +1,22 @@
+{
+  "problem_id": "ZipCPU/wb2axip/4414539e93a591b7b6fc90a68873d8aaaf3a16b9",
+  "repo_url": "https://github.com/ZipCPU/wb2axip",
+  "owner": "ZipCPU",
+  "repo_name": "wb2axip",
+  "fix_commit": "4414539e93a591b7b6fc90a68873d8aaaf3a16b9",
+  "buggy_rtl_commit": "4414539e93a591b7b6fc90a68873d8aaaf3a16b9^",
+  "fix_commit_msg": "FIX: Incorrect AXI-Lite upsize shift on WSTRB",
+  "description": "FIX: Incorrect AXI-Lite upsize shift on WSTRB",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "bench",
+  "rtl_files_changed": [
+    "rtl/axilupsz.v"
+  ],
+  "test_commands": [
+    "bash problems/ZipCPU/wb2axip/run_tb_44145397.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/axilupsz.v b/rtl/axilupsz.v\nindex 29dc41d..1afc0e3 100644\n--- a/rtl/axilupsz.v\n+++ b/rtl/axilupsz.v\n@@ -267,7 +267,7 @@ module\taxilupsz #(\n \n \t\t\tif (!OPT_LOWPOWER || wskd_valid)\n \t\t\t\twstrb <= (wskd_strb)\n-\t\t\t\t\t<< (awskd_addr[MLSB-1:SLSB] *  SDW);\n+\t\t\t\t\t<< (awskd_addr[MLSB-1:SLSB] *(SDW/8));\n \t\t\t// Verilator lint_on WIDTH\n \t\tend\n \t\t// }}}",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

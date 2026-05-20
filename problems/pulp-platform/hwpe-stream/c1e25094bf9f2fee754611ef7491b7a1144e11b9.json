@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/hwpe-stream/c1e25094bf9f2fee754611ef7491b7a1144e11b9",
+  "repo_url": "https://github.com/pulp-platform/hwpe-stream",
+  "owner": "pulp-platform",
+  "repo_name": "hwpe-stream",
+  "fix_commit": "c1e25094bf9f2fee754611ef7491b7a1144e11b9",
+  "buggy_rtl_commit": "b3d33afdd27e79bcda1348d0ab5f4afd52c03106",
+  "fix_commit_msg": "[hwpe_stream_fifo] Correctly assign almost full signal",
+  "description": "[hwpe_stream_fifo] Correctly assign almost full signal",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "rtl/verif",
+  "rtl_files_changed": [
+    "rtl/fifo/hwpe_stream_fifo.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/hwpe-stream/run_tb_c1e25094.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/fifo/hwpe_stream_fifo.sv b/rtl/fifo/hwpe_stream_fifo.sv\nindex 5e5a3e4..d02aaca 100644\n--- a/rtl/fifo/hwpe_stream_fifo.sv\n+++ b/rtl/fifo/hwpe_stream_fifo.sv\n@@ -96,7 +96,7 @@ module hwpe_stream_fifo #(\n   assign flags_o.empty = (cs == EMPTY) ? 1'b1 : 1'b0;\n   assign flags_o.full  = (cs == FULL)  ? 1'b1 : 1'b0;\n   assign flags_o.almost_empty = (cs == MIDDLE) && ((pop_pointer_q == push_pointer_q-1 ) || ((pop_pointer_q == FIFO_DEPTH-1) && (push_pointer_q == 0) )) ? 1'b1 : 1'b0;\n-  assign flags_o.almost_full  = (cs == MIDDLE) && ((pop_pointer_q == push_pointer_q-1 ) || ((pop_pointer_q == FIFO_DEPTH-1) && (push_pointer_q == 0) )) ? 1'b1 : 1'b0;\n+  assign flags_o.almost_full  = (cs == MIDDLE) && ((push_pointer_q == pop_pointer_q-1 ) || ((push_pointer_q == FIFO_DEPTH-1) && (pop_pointer_q == 0) )) ? 1'b1 : 1'b0;\n \n   // state update\n   always_ff @(posedge clk_i, negedge rst_ni)",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

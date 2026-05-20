@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/apb_spi_master/4fce41f5a4449e0f19dd086e025f82e8b90c143f",
+  "repo_url": "https://github.com/pulp-platform/apb_spi_master",
+  "owner": "pulp-platform",
+  "repo_name": "apb_spi_master",
+  "fix_commit": "4fce41f5a4449e0f19dd086e025f82e8b90c143f",
+  "buggy_rtl_commit": "df3def8a07d83dc4bcfd37ec35cf5f2445b6b6d1",
+  "fix_commit_msg": "Fix to fifo_tx in spi master APB version\n\n\ngit-svn-id: https://iis-codendi.ee.ethz.ch/svnroot/PULP@1567 7b29e81b-0d0f-40cb-b670-6c1e2575089b",
+  "description": "Fix to fifo_tx in spi master APB version\n\n\ngit-svn-id: https://iis-codendi.ee.ethz.ch/svnroot/PULP@1567 7b29e81b-0d0f-40cb-b670-6c1e2575089b",
+  "date_created": "2026-05-19",
+  "rtl_dir": ".",
+  "dv_dir": ".",
+  "rtl_files_changed": [
+    "spi_master_apb_if.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/apb_spi_master/run_tb_4fce41f5.sh"
+  ],
+  "rtl_diff": "diff --git a/spi_master_apb_if.sv b/spi_master_apb_if.sv\nindex 87297fe..6477e32 100644\n--- a/spi_master_apb_if.sv\n+++ b/spi_master_apb_if.sv\n@@ -127,8 +127,8 @@ module spi_master_apb_if #(\n \t\t\t\t\tspi_addr = PWDATA;\n \t\t\t\t`REG_SPILEN:\n \t\t\t\tbegin\n-\t\t\t\t\tspi_cmd_len = PWDATA[7:0];\n-\t\t\t\t\tspi_addr_len = PWDATA[15:8];\n+\t\t\t\t\tspi_cmd_len = PWDATA[5:0];\n+\t\t\t\t\tspi_addr_len = PWDATA[13:8];\n \t\t\t\t\tspi_data_len[7:0] = PWDATA[23:16];\n \t\t\t\t\tspi_data_len[15:8] = PWDATA[31:24];\n \t\t\t\tend\n@@ -173,7 +173,8 @@ module spi_master_apb_if #(\n \t\t\tPRDATA = spi_data_rx;\n       endcase\n     end // SLAVE_REG_READ_PROC\n-\n+    \n+    assign spi_data_tx       = PWDATA;\n     assign spi_data_tx_valid = PSEL & PENABLE &  PWRITE & (write_address == `REG_TXFIFO);\n     assign spi_data_rx_ready = PSEL & PENABLE & ~PWRITE & (read_address  == `REG_RXFIFO);",
+  "rtl_diff_lines": 7,
+  "source": "historical"
+}

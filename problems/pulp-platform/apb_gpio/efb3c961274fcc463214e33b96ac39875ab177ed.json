@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/apb_gpio/efb3c961274fcc463214e33b96ac39875ab177ed",
+  "repo_url": "https://github.com/pulp-platform/apb_gpio",
+  "owner": "pulp-platform",
+  "repo_name": "apb_gpio",
+  "fix_commit": "efb3c961274fcc463214e33b96ac39875ab177ed",
+  "buggy_rtl_commit": "909a1fc20dfebe2f0ecc23de3a175456d9d07c7c",
+  "fix_commit_msg": ":bug: change polarity of padoutclr content. A 1'b1 at index i will clear the gpio i output",
+  "description": ":bug: change polarity of padoutclr content. A 1'b1 at index i will clear the gpio i output",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "rtl",
+  "rtl_files_changed": [
+    "rtl/apb_gpio.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/apb_gpio/run_tb_efb3c961.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/apb_gpio.sv b/rtl/apb_gpio.sv\nindex 7fb7e05..2e3d72d 100644\n--- a/rtl/apb_gpio.sv\n+++ b/rtl/apb_gpio.sv\n@@ -314,14 +314,14 @@ module apb_gpio\n                     s_write_out[31:0]  = 32'hFFFFFFFF;\n                     for(int i=0;i<32;i++)\n                         if(i<PAD_NUM)\n-                            s_gpio_out[i]  = r_gpio_out[i] & PWDATA[i];\n+                            s_gpio_out[i]  = r_gpio_out[i] & ~PWDATA[i];\n                 end\n                 `REG_PADOUTCLR_32_63:\n                 begin\n                     s_write_out[63:32] = 32'hFFFFFFFF;\n                     for(int i=32;i<64;i++)\n                         if(i<PAD_NUM)\n-                            s_gpio_out[i]  = r_gpio_out[i] & PWDATA[i-32];\n+                            s_gpio_out[i]  = r_gpio_out[i] & ~PWDATA[i-32];\n                 end\n                 `REG_INTEN_00_31:\n                 begin",
+  "rtl_diff_lines": 4,
+  "source": "historical"
+}

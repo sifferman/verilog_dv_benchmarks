@@ -1,0 +1,23 @@
+{
+  "problem_id": "corundum/corundum/edc590315737e776d026931541acef4d551e3013",
+  "repo_url": "https://github.com/corundum/corundum",
+  "owner": "corundum",
+  "repo_name": "corundum",
+  "fix_commit": "edc590315737e776d026931541acef4d551e3013",
+  "buggy_rtl_commit": "edc59031^",
+  "fix_commit_msg": "fpga/common: Fix FIFO status connections\n\nSigned-off-by: Alex Forencich <alex@alexforencich.com>",
+  "description": "fpga/common: Fix FIFO status connections\n\nSigned-off-by: Alex Forencich <alex@alexforencich.com>",
+  "date_created": "2026-05-19",
+  "rtl_dir": "fpga/common/rtl",
+  "dv_dir": "fpga/common/tb",
+  "rtl_files_changed": [
+    "fpga/common/rtl/rx_fifo.v",
+    "fpga/common/rtl/tx_fifo.v"
+  ],
+  "test_commands": [
+    "bash problems/corundum/corundum/run_edc59031.sh"
+  ],
+  "rtl_diff": "diff --git a/fpga/common/rtl/rx_fifo.v b/fpga/common/rtl/rx_fifo.v\nindex 8a8dca6c..df918899 100644\n--- a/fpga/common/rtl/rx_fifo.v\n+++ b/fpga/common/rtl/rx_fifo.v\n@@ -174,9 +174,9 @@ for (n = 0; n < PORTS; n = n + 1) begin : fifo\n         .m_axis_tuser(axis_fifo_tuser[n*USER_WIDTH +: USER_WIDTH]),\n \n         // Status\n-        .status_overflow(status_overflow),\n-        .status_bad_frame(status_bad_frame),\n-        .status_good_frame(status_good_frame)\n+        .status_overflow(status_overflow[n]),\n+        .status_bad_frame(status_bad_frame[n]),\n+        .status_good_frame(status_good_frame[n])\n     );\n \n end\ndiff --git a/fpga/common/rtl/tx_fifo.v b/fpga/common/rtl/tx_fifo.v\nindex 9d6612ff..f809e5a1 100644\n--- a/fpga/common/rtl/tx_fifo.v\n+++ b/fpga/common/rtl/tx_fifo.v\n@@ -232,9 +232,9 @@ for (n = 0; n < PORTS; n = n + 1) begin : fifo\n         .m_axis_tuser(m_axis_tuser[n*USER_WIDTH +: USER_WIDTH]),\n \n         // Status\n-        .status_overflow(status_overflow),\n-        .status_bad_frame(status_bad_frame),\n-        .status_good_frame(status_good_frame)\n+        .status_overflow(status_overflow[n]),\n+        .status_bad_frame(status_bad_frame[n]),\n+        .status_good_frame(status_good_frame[n])\n     );\n \n end",
+  "rtl_diff_lines": 12,
+  "source": "historical"
+}

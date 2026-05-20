@@ -1,0 +1,22 @@
+{
+  "problem_id": "vortexgpgpu/vortex/6c1ee9bfea39505bec258b0f705aa4f79fb0dbf9",
+  "repo_url": "https://github.com/vortexgpgpu/vortex",
+  "owner": "vortexgpgpu",
+  "repo_name": "vortex",
+  "fix_commit": "6c1ee9bfea39505bec258b0f705aa4f79fb0dbf9",
+  "buggy_rtl_commit": "14ae4b8c13ac225d5ee69904169d761996316f36",
+  "fix_commit_msg": "arbiter fixes",
+  "description": "arbiter fixes",
+  "date_created": "2026-05-19",
+  "rtl_dir": "hw/rtl",
+  "dv_dir": "hw/unittest",
+  "rtl_files_changed": [
+    "hw/rtl/libs/VX_cyclic_arbiter.sv"
+  ],
+  "test_commands": [
+    "bash problems/vortexgpgpu/vortex/run_tb_6c1ee9bf.sh"
+  ],
+  "rtl_diff": "diff --git a/hw/rtl/libs/VX_cyclic_arbiter.sv b/hw/rtl/libs/VX_cyclic_arbiter.sv\nindex c4a42da1..d721e513 100644\n--- a/hw/rtl/libs/VX_cyclic_arbiter.sv\n+++ b/hw/rtl/libs/VX_cyclic_arbiter.sv\n@@ -30,6 +30,7 @@ module VX_cyclic_arbiter #(\n \n         `UNUSED_VAR (clk)\n         `UNUSED_VAR (reset)\n+        `UNUSED_VAR (grant_ready)\n \n         assign grant_index  = '0;\n         assign grant_onehot = requests;\n@@ -39,29 +40,35 @@ module VX_cyclic_arbiter #(\n \n         localparam IS_POW2 = (1 << LOG_NUM_REQS) == NUM_REQS;\n \n+        wire [LOG_NUM_REQS-1:0] grant_index_um, grant_index_ql;\n         reg [LOG_NUM_REQS-1:0] grant_index_r;\n \n         always @(posedge clk) begin\n             if (reset) begin\n                 grant_index_r <= '0;\n-            end else begin\n-                if (!IS_POW2 && grant_index_r == LOG_NUM_REQS'(NUM_REQS-1)) begin\n+            end else if (grant_valid && grant_ready) begin\n+                if (!IS_POW2 && grant_index_ql == LOG_NUM_REQS'(NUM_REQS-1)) begin\n                     grant_index_r <= '0;\n-                end else if (~grant_valid || grant_ready) begin\n-                    grant_index_r <= grant_index_r + LOG_NUM_REQS'(1);\n+                end else begin\n+                    grant_index_r <= grant_index_ql + LOG_NUM_REQS'(1);\n                 end\n             end\n         end\n \n-        reg [NUM_REQS-1:0] grant_onehot_r;\n-        always @(*) begin\n-            grant_onehot_r = '0;\n-            grant_onehot_r[grant_index_r] = 1'b1;\n-        end\n+        VX_priority_encoder #(\n+            .N (NUM_REQS)\n+        ) priority_encoder (\n+            .data_in    (requests),\n+            `UNUSED_PIN (onehot_out),\n+            .index_out  (grant_index_um),\n+            `UNUSED_PIN (valid_out)\n+        );\n+\n+        assign grant_index_ql = requests[grant_index_r] ? grant_index_r : grant_index_um;\n \n-        assign grant_index  = grant_index_r;\n-        assign grant_onehot = grant_onehot_r;\n-        assign grant_valid  = requests[grant_index_r];\n+        assign grant_index  = grant_index_ql;\n+        assign grant_onehot = NUM_REQS'(1) << grant_index_ql;\n+        assign grant_valid  = (| requests);\n \n     end\n \ndiff --git a/hw/rtl/libs/VX_generic_arbiter.sv b/hw/rtl/libs/VX_generic_arbiter.sv\nindex a3c4b71d..f55b866f 100644\n--- a/hw/rtl/libs/VX_generic_arbiter.sv\n+++ b/hw/rtl/libs/VX_generic_arbiter.sv\n@@ -90,5 +90,7 @@ module VX_generic_arbiter #(\n \n     end\n \n+    `RUNTIME_ASSERT ((~grant_valid || (requests[grant_index] != 0)), (\"invalid arbiter grant!\"))\n+\n endmodule\n `TRACING_ON\ndiff --git a/hw/rtl/libs/VX_rr_arbiter.sv b/hw/rtl/libs/VX_rr_arbiter.sv\nindex 85cf96f9..8c0fa055 100644\n--- a/hw/rtl/libs/VX_rr_arbiter.sv\n+++ b/hw/rtl/libs/VX_rr_arbiter.sv\n@@ -459,7 +459,7 @@ module VX_rr_arbiter #(\n                 grant_table[i] = 'x;\n                 for (integer j = NUM_REQS-1; j >= 0; --j) begin\n                     if (requests[(i+j+1) % NUM_REQS]) begin\n-                        grant_table[i] = LOG_NUM_REQS'(i+j+1);\n+                        grant_table[i] = LOG_NUM_REQS'((i+j+1) % NUM_REQS);\n                     end\n                 end\n             end",
+  "rtl_diff_lines": 35,
+  "source": "historical"
+}

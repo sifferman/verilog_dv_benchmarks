@@ -1,0 +1,22 @@
+{
+  "problem_id": "olofk/serv/7765567cf1f717b7eccadca9c85b5e82e5f21616",
+  "repo_url": "https://github.com/olofk/serv",
+  "owner": "olofk",
+  "repo_name": "serv",
+  "fix_commit": "7765567cf1f717b7eccadca9c85b5e82e5f21616",
+  "buggy_rtl_commit": "7765567cf1f717b7eccadca9c85b5e82e5f21616^",
+  "fix_commit_msg": "Add missing gate on mem_rd with CSR disabled",
+  "description": "Add missing gate on mem_rd with CSR disabled",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "bench",
+  "rtl_files_changed": [
+    "rtl/serv_rf_if.v"
+  ],
+  "test_commands": [
+    "bash problems/olofk/serv/run_tb_7765567c.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/serv_rf_if.v b/rtl/serv_rf_if.v\nindex 0c5dd67..cf23790 100644\n--- a/rtl/serv_rf_if.v\n+++ b/rtl/serv_rf_if.v\n@@ -122,7 +122,7 @@ module serv_rf_if\n    end else begin\n       wire \t     rd = (i_ctrl_rd ) |\n \t\t\t  (i_alu_rd & i_rd_alu_en) |\n-\t\t\t  (i_mem_rd);\n+\t\t\t  (i_mem_rd & i_rd_mem_en);\n \n       assign \t     o_wdata0 = rd;\n       assign\t     o_wdata1 = 1'b0;",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

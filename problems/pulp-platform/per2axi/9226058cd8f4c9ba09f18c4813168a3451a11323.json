@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/per2axi/9226058cd8f4c9ba09f18c4813168a3451a11323",
+  "repo_url": "https://github.com/pulp-platform/per2axi",
+  "owner": "pulp-platform",
+  "repo_name": "per2axi",
+  "fix_commit": "9226058cd8f4c9ba09f18c4813168a3451a11323",
+  "buggy_rtl_commit": "8d253a0938c8652f8453d8b6366f9f2397a123d2",
+  "fix_commit_msg": "per2axi_req_channel: Fix handshake on `per_slave` port",
+  "description": "per2axi_req_channel: Fix handshake on `per_slave` port",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "test",
+  "rtl_files_changed": [
+    "src/per2axi_req_channel.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/per2axi/run_tb_92260580.sh"
+  ],
+  "rtl_diff": "diff --git a/src/per2axi_req_channel.sv b/src/per2axi_req_channel.sv\nindex 0e3284b..2e84551 100644\n--- a/src/per2axi_req_channel.sv\n+++ b/src/per2axi_req_channel.sv\n@@ -143,7 +143,7 @@ module per2axi_req_channel\n      end\n    \n    // PERIPHERAL INTERCONNECT GRANT GENERATION\n-   assign per_slave_gnt_o = axi_master_aw_ready_i && axi_master_ar_ready_i;\n+   assign per_slave_gnt_o = axi_master_aw_ready_i && axi_master_ar_ready_i && axi_master_w_ready_i;\n    \n    always_comb\n      begin",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

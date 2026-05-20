@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/common_cells/4f099df81e439cfebed7e0dd816ef1c2720099fa",
+  "repo_url": "https://github.com/pulp-platform/common_cells",
+  "owner": "pulp-platform",
+  "repo_name": "common_cells",
+  "fix_commit": "4f099df81e439cfebed7e0dd816ef1c2720099fa",
+  "buggy_rtl_commit": "0c00f2881a0116b987d8d56e86835f7f16515fa2",
+  "fix_commit_msg": "fifo_v3: Fix data output when pushing into empty fall-through FIFO",
+  "description": "fifo_v3: Fix data output when pushing into empty fall-through FIFO",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "test",
+  "rtl_files_changed": [
+    "src/fifo_v3.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/common_cells/run_tb_4f099df8.sh"
+  ],
+  "rtl_diff": "diff --git a/src/fifo_v3.sv b/src/fifo_v3.sv\nindex 738a660..8c48773 100644\n--- a/src/fifo_v3.sv\n+++ b/src/fifo_v3.sv\n@@ -97,11 +97,13 @@ module fifo_v3 #(\n             status_cnt_n   = status_cnt_q;\n \n         // FIFO is in pass through mode -> do not change the pointers\n-        if (FALL_THROUGH && (status_cnt_q == 0) && push_i && pop_i) begin\n+        if (FALL_THROUGH && (status_cnt_q == 0) && push_i) begin\n             data_o = data_i;\n-            status_cnt_n = status_cnt_q;\n-            read_pointer_n = read_pointer_q;\n-            write_pointer_n = write_pointer_q;\n+            if (pop_i) begin\n+                status_cnt_n = status_cnt_q;\n+                read_pointer_n = read_pointer_q;\n+                write_pointer_n = write_pointer_q;\n+            end\n         end\n     end",
+  "rtl_diff_lines": 10,
+  "source": "historical"
+}

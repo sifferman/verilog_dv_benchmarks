@@ -1,0 +1,22 @@
+{
+  "problem_id": "bespoke-silicon-group/basejump_stl/527b3becd6d74bb2e92080b8d34500e3e59c9da4",
+  "repo_url": "https://github.com/bespoke-silicon-group/basejump_stl",
+  "owner": "bespoke-silicon-group",
+  "repo_name": "basejump_stl",
+  "fix_commit": "527b3becd6d74bb2e92080b8d34500e3e59c9da4",
+  "buggy_rtl_commit": "5a953bcae375ed4ada0aab1aab59ae5a46cf8210",
+  "fix_commit_msg": "[BUG FIX] Always read from bypass fifo when read_write_dame_addr happens, fully bypass hardened mem",
+  "description": "[BUG FIX] Always read from bypass fifo when read_write_dame_addr happens, fully bypass hardened mem",
+  "date_created": "2026-05-19",
+  "rtl_dir": "bsg_dataflow",
+  "dv_dir": "testing",
+  "rtl_files_changed": [
+    "bsg_dataflow/bsg_fifo_1r1w_small_hardened.sv"
+  ],
+  "test_commands": [
+    "bash problems/bespoke-silicon-group/basejump_stl/run_tb_527b3bec.sh"
+  ],
+  "rtl_diff": "diff --git a/bsg_dataflow/bsg_fifo_1r1w_small_hardened.sv b/bsg_dataflow/bsg_fifo_1r1w_small_hardened.sv\nindex 292fdae..bc07c2c 100644\n--- a/bsg_dataflow/bsg_fifo_1r1w_small_hardened.sv\n+++ b/bsg_dataflow/bsg_fifo_1r1w_small_hardened.sv\n@@ -82,6 +82,8 @@ module bsg_fifo_1r1w_small_hardened #(parameter `BSG_INV_PARAM(width_p)\n       ,.empty_o  (empty)\n       );\n \n+   // Only read / write hardened mem when read_write_same_addr is false\n+   wire write_mem_en = enque && (wptr_r != rptr_n);\n    wire read_mem_en = deque && (wptr_r != rptr_n);\n   \n    // sync read\n@@ -96,12 +98,12 @@ module bsg_fifo_1r1w_small_hardened #(parameter `BSG_INV_PARAM(width_p)\n                       ) mem_1r1w_sync\n      (.clk_i\n       ,.reset_i\n-      ,.w_v_i    (enque     )\n-      ,.w_addr_i (wptr_r    )\n-      ,.w_data_i (data_i    )\n-      ,.r_v_i    (read_mem_en & ~read_write_same_addr_n)\n-      ,.r_addr_i (rptr_n    )\n-      ,.r_data_o (data_o_mem)\n+      ,.w_v_i    (write_mem_en)\n+      ,.w_addr_i (wptr_r      )\n+      ,.w_data_i (data_i      )\n+      ,.r_v_i    (read_mem_en )\n+      ,.r_addr_i (rptr_n      )\n+      ,.r_data_o (data_o_mem  )\n       );\n       \n    // w_data bypass register, enable when read_write_same_addr happens\n@@ -114,8 +116,15 @@ module bsg_fifo_1r1w_small_hardened #(parameter `BSG_INV_PARAM(width_p)\n    \n    // Read from bypass register when read_write_same_addr happens in previous cycle\n    assign data_o = (read_write_same_addr_r)? data_o_reg : data_o_mem;\n-   always_ff @(posedge clk_i)\n-     read_write_same_addr_r <= read_write_same_addr_n;\n+   // When read_write_same_addr happens, data will not be written into the hardened mem\n+   // In this case, always read from the bypass reg until deque\n+   bsg_dff_reset_set_clear #(.width_p(1)) read_write_same_addr_reg\n+   (.clk_i\n+   ,.reset_i\n+   ,.set_i   (read_write_same_addr_n)\n+   ,.clear_i (deque)\n+   ,.data_o  (read_write_same_addr_r)\n+   );\n    \n    // When enque==1 and read/write address are same, stop reading\n    // A copy of data is written into bypass register in same cycle",
+  "rtl_diff_lines": 25,
+  "source": "historical"
+}

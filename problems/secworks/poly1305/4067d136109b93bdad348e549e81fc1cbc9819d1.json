@@ -1,0 +1,22 @@
+{
+  "problem_id": "secworks/poly1305/4067d136109b93bdad348e549e81fc1cbc9819d1",
+  "repo_url": "https://github.com/secworks/poly1305",
+  "owner": "secworks",
+  "repo_name": "poly1305",
+  "fix_commit": "4067d136109b93bdad348e549e81fc1cbc9819d1",
+  "buggy_rtl_commit": "850bf2f027b2d35035c016fe43cef1720a443e0d",
+  "fix_commit_msg": "Adding testcase_8 from monocypher. This testcase really tests the carry propagation in the poly_final function. Adjusted number of processing cycles in poly1305_final. Test OK.",
+  "description": "Adding testcase_8 from monocypher. This testcase really tests the carry propagation in the poly_final function. Adjusted number of processing cycles in poly1305_final. Test OK.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src/rtl",
+  "dv_dir": "src/tb",
+  "rtl_files_changed": [
+    "src/rtl/poly1305_final.v"
+  ],
+  "test_commands": [
+    "bash problems/secworks/poly1305/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/src/rtl/poly1305_final.v b/src/rtl/poly1305_final.v\nindex a26e421..bec828e 100644\n--- a/src/rtl/poly1305_final.v\n+++ b/src/rtl/poly1305_final.v\n@@ -63,7 +63,7 @@ module poly1305_final(\n   //----------------------------------------------------------------\n   // Parameters and symbolic values.\n   //----------------------------------------------------------------\n-  localparam PIPE_CYCLES    = 4'h0;\n+  localparam PIPE_CYCLES    = 4'h6;\n \n   localparam CTRL_IDLE      = 2'h0;\n   localparam CTRL_PIPE_WAIT = 2'h1;",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

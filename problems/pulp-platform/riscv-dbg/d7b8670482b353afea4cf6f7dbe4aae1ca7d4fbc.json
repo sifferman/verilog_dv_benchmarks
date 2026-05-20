@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/riscv-dbg/d7b8670482b353afea4cf6f7dbe4aae1ca7d4fbc",
+  "repo_url": "https://github.com/pulp-platform/riscv-dbg",
+  "owner": "pulp-platform",
+  "repo_name": "riscv-dbg",
+  "fix_commit": "d7b8670482b353afea4cf6f7dbe4aae1ca7d4fbc",
+  "buggy_rtl_commit": "210d89935924ea7084145db9dbdc4d17597d63d7",
+  "fix_commit_msg": "src: Fix wrong reset state for TAP after trst_ni\n\nThis problem was didn't become visible as most/all drivers always run\nthe software reset sequence as trst_ni is an optional signal.",
+  "description": "src: Fix wrong reset state for TAP after trst_ni\n\nThis problem was didn't become visible as most/all drivers always run\nthe software reset sequence as trst_ni is an optional signal.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "tb",
+  "rtl_files_changed": [
+    "src/dmi_jtag_tap.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/riscv-dbg/run_tb_d7b86704.sh"
+  ],
+  "rtl_diff": "diff --git a/src/dmi_jtag_tap.sv b/src/dmi_jtag_tap.sv\nindex 53f0fa9..d627cef 100644\n--- a/src/dmi_jtag_tap.sv\n+++ b/src/dmi_jtag_tap.sv\n@@ -303,7 +303,7 @@ module dmi_jtag_tap #(\n \n   always_ff @(posedge tck_i or negedge trst_ni) begin : p_regs\n     if (!trst_ni) begin\n-      tap_state_q <= RunTestIdle;\n+      tap_state_q <= TestLogicReset;\n       idcode_q    <= IdcodeValue;\n       bypass_q    <= 1'b0;\n     end else begin",
+  "rtl_diff_lines": 2,
+  "source": "historical"
+}

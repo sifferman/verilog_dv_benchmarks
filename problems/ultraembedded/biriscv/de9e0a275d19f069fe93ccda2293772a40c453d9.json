@@ -1,0 +1,22 @@
+{
+  "problem_id": "ultraembedded/biriscv/de9e0a275d19f069fe93ccda2293772a40c453d9",
+  "repo_url": "https://github.com/ultraembedded/biriscv",
+  "owner": "ultraembedded",
+  "repo_name": "biriscv",
+  "fix_commit": "de9e0a275d19f069fe93ccda2293772a40c453d9",
+  "buggy_rtl_commit": "0eb3e4305d4c84a12e540a1e2f198282bab75501",
+  "fix_commit_msg": "Additional support for routing external (and timer) interrupts to supervisor mode (if enabled via csr_mideleg).",
+  "description": "Additional support for routing external (and timer) interrupts to supervisor mode (if enabled via csr_mideleg).",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src",
+  "dv_dir": "tb",
+  "rtl_files_changed": [
+    "src/core/biriscv_csr_regfile.v"
+  ],
+  "test_commands": [
+    "bash problems/ultraembedded/biriscv/run_de9e0a27.sh"
+  ],
+  "rtl_diff": "diff --git a/src/core/biriscv_csr_regfile.v b/src/core/biriscv_csr_regfile.v\nindex 8f80634..ec68a9b 100644\n--- a/src/core/biriscv_csr_regfile.v\n+++ b/src/core/biriscv_csr_regfile.v\n@@ -147,12 +147,12 @@ reg csr_mip_upd_q;\n always @ (posedge clk_i or posedge rst_i)\n if (rst_i)\n     csr_mip_upd_q <= 1'b0;\n-else if (csr_ren_i && csr_raddr_i == `CSR_MIP)\n+else if ((csr_ren_i && csr_raddr_i == `CSR_MIP) || (csr_ren_i && csr_raddr_i == `CSR_SIP))\n     csr_mip_upd_q <= 1'b1;\n-else if (csr_waddr_i == `CSR_MIP || (|exception_i))\n+else if (csr_waddr_i == `CSR_MIP || csr_waddr_i == `CSR_SIP || (|exception_i))\n     csr_mip_upd_q <= 1'b0;\n \n-wire buffer_mip_w = (csr_ren_i && csr_raddr_i == `CSR_MIP) | csr_mip_upd_q;\n+wire buffer_mip_w = (csr_ren_i && csr_raddr_i == `CSR_MIP) | (csr_ren_i && csr_raddr_i == `CSR_SIP) | csr_mip_upd_q;\n \n //-----------------------------------------------------------------\n // CSR Read Port\n@@ -448,14 +448,20 @@ begin\n     end\n  \n     // External interrupts\n-    if (ext_intr_i)   csr_mip_next_r[`SR_IP_MEIP_R] = 1'b1;\n-    if (timer_intr_i) csr_mip_next_r[`SR_IP_MTIP_R] = 1'b1;\n+    // NOTE: If the machine level interrupts are delegated to supervisor, route the interrupts there instead..\n+    if (ext_intr_i   &&  csr_mideleg_q[`SR_IP_MEIP_R]) csr_mip_next_r[`SR_IP_SEIP_R] = 1'b1;\n+    if (ext_intr_i   && ~csr_mideleg_q[`SR_IP_MEIP_R]) csr_mip_next_r[`SR_IP_MEIP_R] = 1'b1;\n+    if (timer_intr_i &&  csr_mideleg_q[`SR_IP_MTIP_R]) csr_mip_next_r[`SR_IP_STIP_R] = 1'b1;\n+    if (timer_intr_i && ~csr_mideleg_q[`SR_IP_MTIP_R]) csr_mip_next_r[`SR_IP_MTIP_R] = 1'b1;\n \n     // Optional: Internal timer compare interrupt\n     if (SUPPORT_MTIMECMP && csr_mcycle_q == csr_mtimecmp_q)\n     begin\n-        csr_mip_next_r[`SR_IP_MTIP_R] = csr_mtime_ie_q;\n-        csr_mtime_ie_r                = 1'b0;\n+        if (csr_mideleg_q[`SR_IP_MTIP_R])\n+            csr_mip_next_r[`SR_IP_STIP_R] = csr_mtime_ie_q;\n+        else\n+            csr_mip_next_r[`SR_IP_MTIP_R] = csr_mtime_ie_q;\n+        csr_mtime_ie_r  = 1'b0;\n     end\n \n     csr_mip_r = csr_mip_r | csr_mip_next_r;",
+  "rtl_diff_lines": 20,
+  "source": "historical"
+}

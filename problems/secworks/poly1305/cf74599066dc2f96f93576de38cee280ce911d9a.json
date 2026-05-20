@@ -1,0 +1,22 @@
+{
+  "problem_id": "secworks/poly1305/cf74599066dc2f96f93576de38cee280ce911d9a",
+  "repo_url": "https://github.com/secworks/poly1305",
+  "owner": "secworks",
+  "repo_name": "poly1305",
+  "fix_commit": "cf74599066dc2f96f93576de38cee280ce911d9a",
+  "buggy_rtl_commit": "ba025e8456a5b57613da5c98ddf77d8ddf920bd6",
+  "fix_commit_msg": "Realised that the word order was flipped when assigning final MAC. Now the complete bytes16 test cases goes through as expected. Updated core TB to allow display of internal state of final module.",
+  "description": "Realised that the word order was flipped when assigning final MAC. Now the complete bytes16 test cases goes through as expected. Updated core TB to allow display of internal state of final module.",
+  "date_created": "2026-05-19",
+  "rtl_dir": "src/rtl",
+  "dv_dir": "src/tb",
+  "rtl_files_changed": [
+    "src/rtl/poly1305_core.v"
+  ],
+  "test_commands": [
+    "bash problems/secworks/poly1305/run_tests.sh"
+  ],
+  "rtl_diff": "diff --git a/src/rtl/poly1305_core.v b/src/rtl/poly1305_core.v\nindex b8e002e..14e8ad3 100644\n--- a/src/rtl/poly1305_core.v\n+++ b/src/rtl/poly1305_core.v\n@@ -333,10 +333,10 @@ module poly1305_core(\n \n       if (mac_update)\n         begin\n-          mac_new[0] = le(hres0);\n-          mac_new[1] = le(hres1);\n-          mac_new[2] = le(hres2);\n-          mac_new[3] = le(hres3);\n+          mac_new[3] = le(hres0);\n+          mac_new[2] = le(hres1);\n+          mac_new[1] = le(hres2);\n+          mac_new[0] = le(hres3);\n           mac_we     = 1'h1;\n         end\n     end // poly1305_core_logic",
+  "rtl_diff_lines": 8,
+  "source": "historical"
+}

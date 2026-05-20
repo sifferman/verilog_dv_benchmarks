@@ -11,6 +11,7 @@ fusesoc/
 # Simulator build outputs under problems/ and clones/
 sim_build/
 obj_dir/
+build_*/
 **/*.vcd
 **/*.fst
 **/*.vvp

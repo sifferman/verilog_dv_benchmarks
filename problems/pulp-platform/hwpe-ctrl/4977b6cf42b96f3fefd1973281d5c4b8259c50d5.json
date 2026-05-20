@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/hwpe-ctrl/4977b6cf42b96f3fefd1973281d5c4b8259c50d5",
+  "repo_url": "https://github.com/pulp-platform/hwpe-ctrl",
+  "owner": "pulp-platform",
+  "repo_name": "hwpe-ctrl",
+  "fix_commit": "4977b6cf42b96f3fefd1973281d5c4b8259c50d5",
+  "buggy_rtl_commit": "86c6ad7b752a08c048763bd01661da5e4845698e",
+  "fix_commit_msg": "rtl: :bug: Fix FF regfile not properly implementing 1-cc-latency reads",
+  "description": "rtl: :bug: Fix FF regfile not properly implementing 1-cc-latency reads",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "tb",
+  "rtl_files_changed": [
+    "rtl/hwpe_ctrl_regfile_ff.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/hwpe-ctrl/run_tb_4977b6cf.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/hwpe_ctrl_regfile_ff.sv b/rtl/hwpe_ctrl_regfile_ff.sv\nindex be2b59a..c76aaaa 100644\n--- a/rtl/hwpe_ctrl_regfile_ff.sv\n+++ b/rtl/hwpe_ctrl_regfile_ff.sv\n@@ -41,6 +41,7 @@ module hwpe_ctrl_regfile_ff #(\n   output logic [NumWords-1:0][DataWidth-1:0] MemContent_o\n );\n \n+logic [DataWidth-1:0] r_data_d, r_data_q;\n logic [NumWords-1:0][DataWidth-1:0] data_d, data_q;\n \n logic clk_int;\n@@ -50,7 +51,20 @@ assign enable = WriteEnable_i & (WriteAddr_i <= NumWords);\n \n assign clkg_en = enable | clear_i;\n \n-assign ReadData_o = (ReadEnable_i && (ReadAddr_i <= NumWords)) ? data_q[ReadAddr_i] : '0;\n+// Output read with 1 cycle latency\n+always_ff @(posedge clk_i, negedge rst_ni) begin\n+  if (~rst_ni)\n+    r_data_q <= '0;\n+  else begin\n+    if (clear_i)\n+      r_data_q <= '0;\n+    else\n+      r_data_q <= r_data_d;\n+  end\n+end\n+\n+assign r_data_d = (ReadEnable_i && (ReadAddr_i <= NumWords)) ? data_q[ReadAddr_i] : '0;\n+assign ReadData_o = r_data_q;\n \n tc_clk_gating i_we_clkg    (\n    .clk_i        ( clk_i   ),",
+  "rtl_diff_lines": 16,
+  "source": "historical"
+}

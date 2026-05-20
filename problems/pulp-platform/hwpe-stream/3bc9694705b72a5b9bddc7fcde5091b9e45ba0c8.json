@@ -1,0 +1,22 @@
+{
+  "problem_id": "pulp-platform/hwpe-stream/3bc9694705b72a5b9bddc7fcde5091b9e45ba0c8",
+  "repo_url": "https://github.com/pulp-platform/hwpe-stream",
+  "owner": "pulp-platform",
+  "repo_name": "hwpe-stream",
+  "fix_commit": "3bc9694705b72a5b9bddc7fcde5091b9e45ba0c8",
+  "buggy_rtl_commit": "817d3a2e444bbdbec8c0c0058f921ce9ebd19935",
+  "fix_commit_msg": "Fix incorrect behavior of hwpe_stream_fifo",
+  "description": "Fix incorrect behavior of hwpe_stream_fifo",
+  "date_created": "2026-05-19",
+  "rtl_dir": "rtl",
+  "dv_dir": "rtl/verif",
+  "rtl_files_changed": [
+    "rtl/fifo/hwpe_stream_fifo.sv"
+  ],
+  "test_commands": [
+    "bash problems/pulp-platform/hwpe-stream/run_tb_3bc96947.sh"
+  ],
+  "rtl_diff": "diff --git a/rtl/fifo/hwpe_stream_fifo.sv b/rtl/fifo/hwpe_stream_fifo.sv\nindex da79d14..5e5a3e4 100644\n--- a/rtl/fifo/hwpe_stream_fifo.sv\n+++ b/rtl/fifo/hwpe_stream_fifo.sv\n@@ -156,7 +156,10 @@ module hwpe_stream_fifo #(\n           end\n           1'b1 : begin\n             ns = MIDDLE;\n-            push_pointer_d = push_pointer_q + 1'b1;\n+            if(push_pointer_q == FIFO_DEPTH-1)\n+              push_pointer_d = '0;\n+            else\n+              push_pointer_d = push_pointer_q + 1'b1;\n             pop_pointer_d  = pop_pointer_q;\n           end\n         endcase",
+  "rtl_diff_lines": 5,
+  "source": "historical"
+}
