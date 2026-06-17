@@ -1,0 +1,10 @@
+{
+  "_comment": "Absolute path so the agent finds mcp-vcd regardless of how PATH is set in the calling shell. Install via: uv tool install --python 3.13 mcp-vcd",
+  "mcpServers": {
+    "mcp-vcd": {
+      "type": "stdio",
+      "command": "/soe/esifferm/.local/bin/mcp-vcd",
+      "args": []
+    }
+  }
+}
