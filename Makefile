@@ -16,10 +16,11 @@ PROBLEM ?=
 MODE    ?= verify
 WORKERS ?= 1
 
-PY        := python3 python/verify_problem.py
-PY_SANDBOX := python3 python/prepare_sandbox.py
+PY              := python3 python/verify_problem.py
+PY_SANDBOX      := python3 python/prepare_sandbox.py
+PY_TEST_SANDBOX := python3 python/test_sandboxes.py
 
-.PHONY: verify solution buggy sandbox verify-all clean-logs
+.PHONY: verify solution buggy sandbox verify-all test-sandboxes test-sandboxes-all clean-logs
 
 verify solution buggy:
 	$(PY) --problem-id $(PROBLEM) --mode=$@
@@ -29,6 +30,14 @@ sandbox:
 
 verify-all:
 	$(PY) --all --mode=$(MODE) --workers=$(WORKERS)
+
+# Build a sandbox for one problem, run its verify wrapper, expect non-zero exit.
+test-sandboxes:
+	$(PY_TEST_SANDBOX) --problem-id $(PROBLEM)
+
+# Same, across the whole dataset.
+test-sandboxes-all:
+	$(PY_TEST_SANDBOX) --all --workers=$(WORKERS)
 
 clean-logs:
 	rm -rf logs/

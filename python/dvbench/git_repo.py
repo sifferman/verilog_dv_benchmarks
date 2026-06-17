@@ -65,6 +65,20 @@ class GitRepo:
     def revert_files(self, ref: str, file_paths: list[str]) -> None:
         self._git(["checkout", ref, "--"] + file_paths)
 
+    def init_submodule(self, submodule_path: str) -> None:
+        """Populate one submodule's working tree (e.g. `corev_apu/riscv-dbg`).
+        Used by `prepare_sandbox` to materialize submodule files before
+        stripping `.git` from the sandbox copy."""
+        self._git(["submodule", "update", "--init", "--recursive", submodule_path])
+
+    def init_all_submodules_recursively(self) -> None:
+        """Populate every submodule (including nested) of the working tree.
+        Used by `prepare_sandbox` when the runner references submodule paths
+        without explicitly listing them — cheap insurance against a missing
+        submodule. The runner's own `dvbench_init_submodule` helper
+        short-circuits when files are already present."""
+        self._git(["submodule", "update", "--init", "--recursive"])
+
     # ---- read-only queries ---------------------------------------------------
 
     def default_branch_name(self) -> str:

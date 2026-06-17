@@ -61,8 +61,16 @@ DVBENCH_SV2V="$(_dvbench_find_tool \
     /usr/local/bin/sv2v \
     "$HOME/.local/bin/sv2v")"
 
+# verible-verilog-preprocessor (strip-comments subcommand — needed by
+# python/dvbench/scrub.py when materializing a sandbox)
+DVBENCH_VERIBLE_PREPROCESSOR="$(_dvbench_find_tool \
+    "$HOME/Utils/verible/bin/verible-verilog-preprocessor" \
+    /usr/local/bin/verible-verilog-preprocessor \
+    /opt/verible/bin/verible-verilog-preprocessor)"
+
 # --- PATH assembly ------------------------------------------------------------
 
+_dvbench_path_add_dir_of "$DVBENCH_VERIBLE_PREPROCESSOR"
 _dvbench_path_add_dir_of "$DVBENCH_SV2V"
 _dvbench_path_add_dir_of "$DVBENCH_FUSESOC"
 _dvbench_path_add_dir_of "$DVBENCH_OSS_CAD"
@@ -107,22 +115,30 @@ unset PYTHONPATH
 # scripts have to pull in these extra trees themselves.
 
 # Initialize a specific submodule of an already-cloned repo. No-op if the
-# submodule is already populated.
+# submodule's files are already populated (covers both: a) the original
+# .git-present case where post-init the gitlink file exists, and b) the
+# sandbox case where the files were pre-populated and .git has been stripped).
 dvbench_init_submodule() {
     local clone_dir="$1" submodule_path="$2"
-    if [ ! -e "$clone_dir/$submodule_path/.git" ]; then
-        git -C "$clone_dir" submodule update --init "$submodule_path" >/dev/null
+    local submodule_full_path="$clone_dir/$submodule_path"
+    if [ -d "$submodule_full_path" ] && [ -n "$(ls -A "$submodule_full_path" 2>/dev/null)" ]; then
+        return 0
     fi
+    git -C "$clone_dir" submodule update --init "$submodule_path" >/dev/null
 }
 
 # Clone a sibling upstream repo into clones/<owner>/<repo> if missing.
+# No-op if the target dir is already populated (covers both: a) prior clone
+# with a real .git, and b) the sandbox case where files were pre-copied and
+# .git was stripped).
 dvbench_ensure_sibling_clone() {
     local clones_root="$1" owner="$2" repo="$3"
     local target="$clones_root/$owner/$repo"
-    if [ ! -d "$target/.git" ]; then
-        mkdir -p "$clones_root/$owner"
-        git clone --filter=blob:none "https://github.com/$owner/$repo" "$target" >/dev/null
+    if [ -d "$target" ] && [ -n "$(ls -A "$target" 2>/dev/null)" ]; then
+        return 0
     fi
+    mkdir -p "$clones_root/$owner"
+    git clone --filter=blob:none "https://github.com/$owner/$repo" "$target" >/dev/null
 }
 
 # --- FuseSoC config -----------------------------------------------------------

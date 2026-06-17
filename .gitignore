@@ -19,5 +19,11 @@ results.xml
 
 # Local scratch / personal notes
 all.log
+ci.log
 scrape
 SWE-bench.tree
+
+# Benchmark artifacts: gold.jsonl is mechanically derived; eval scores are
+# timestamped per-run. Both regenerate easily — don't commit.
+benchmarks/predictions/
+benchmarks/runs/

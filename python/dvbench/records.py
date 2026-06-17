@@ -16,6 +16,7 @@ from dvbench.constants import (
     REPO_LOCKS_DIRECTORY,
     SUCCESSFUL_RESULT_LABELS,
 )
+from dvbench.scrub import ScrubConfig
 
 
 @dataclass
@@ -34,6 +35,7 @@ class Problem:
     rtl_files_changed: list[str]
     test_commands: list[str]
     problem_json_path: Path
+    scrub_config: ScrubConfig
 
     @staticmethod
     def load_from_json(problem_json_path: Path) -> "Problem":
@@ -48,6 +50,7 @@ class Problem:
             rtl_files_changed=problem_json_data["rtl_files_changed"],
             test_commands=problem_json_data["test_commands"],
             problem_json_path=problem_json_path,
+            scrub_config=ScrubConfig.from_problem_json(problem_json_data),
         )
 
     @property

@@ -28,11 +28,18 @@ jobs:
           # cocotb + cocotb-test for Make-based and pytest-based cocotb testbenches
           pip3 install "cocotb<2" cocotb-test cocotbext-axi cocotbext-eth cocotbext-pcie cocotbext-uart cocotbext-i2c
 
-      - name: Install HDL tools (oss-cad-suite, sv2v)
+      - name: Install HDL tools (oss-cad-suite, sv2v, verible)
         run: |
           wget -O - https://raw.githubusercontent.com/sifferman/hdl-tool-installer/main/install | bash -s -- . --oss-cad-suite --zachjs-sv2v
           echo "$GITHUB_WORKSPACE/oss-cad-suite/bin" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/zachjs-sv2v" >> $GITHUB_PATH
+          # verible-verilog-preprocessor strip-comments — used by the sandbox
+          # scrub to remove SV comments without mangling string literals.
+          VERIBLE_URL=$(curl -sL https://api.github.com/repos/chipsalliance/verible/releases/latest \
+            | python3 -c "import json,sys; [print(a['browser_download_url']) for a in json.load(sys.stdin)['assets'] if 'linux-static-x86_64' in a['name']]")
+          mkdir -p "$GITHUB_WORKSPACE/verible"
+          curl -sSL "$VERIBLE_URL" | tar -xz -C "$GITHUB_WORKSPACE/verible" --strip-components=1
+          echo "$GITHUB_WORKSPACE/verible/bin" >> $GITHUB_PATH
           # Make-based cocotb testbenches (e.g. alexforencich/verilog-axi) load
           # vvp from oss-cad-suite, which links the bundled Python 3.11 — not
           # the system Python. The bundled cocotb 2.x discovers tests by
@@ -51,11 +58,17 @@ jobs:
 
       - name: Verify toolchain availability
         run: |
-          which iverilog verilator yosys sv2v fusesoc riscv32-unknown-elf-gcc
+          which iverilog verilator yosys sv2v fusesoc riscv32-unknown-elf-gcc verible-verilog-preprocessor
           iverilog -V | head -1
           fusesoc --version
           riscv32-unknown-elf-gcc --version | head -1
 
       - run: make verify-all WORKERS=1
+
+      # Sandbox layer: build a self-contained sandbox per problem, run its
+      # `verify` wrapper, and require the buggy RTL state to produce a
+      # non-zero exit. This catches sandbox regressions (missing sibling
+      # clone, broken scrub, .git leakage, etc.) that `verify-all` doesn't.
+      - run: make test-sandboxes-all WORKERS=1
 
       - run: make clean-logs
